@@ -4,15 +4,13 @@ import { useRef } from "react";
 import { ArrowRight, ArrowDown, ShieldCheck, GitBranch, LineChart } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
-import munichFacade from "@/assets/munich-facade.jpg.asset.json";
-
-// Realistic corporate finance photography — Germany-anchored
-const heroImage = {
-  url: "https://images.unsplash.com/photo-1527409030417-70ceafcf6a1c?auto=format&fit=crop&w=2000&q=85",
-};
-const munichCityscape = {
-  url: "https://images.unsplash.com/photo-1599982890963-3aebbf3c2d05?auto=format&fit=crop&w=1600&q=85",
-};
+import heroImage from "@/assets/frankfurt-skyline.jpg.asset.json";
+import munichFacade from "@/assets/munich-city.jpg.asset.json";
+import audInvestors from "@/assets/audience-investors.jpg.asset.json";
+import audAdvisory from "@/assets/audience-advisory.jpg.asset.json";
+import audCorporations from "@/assets/audience-corporations.jpg.asset.json";
+import audIndividuals from "@/assets/audience-individuals.jpg.asset.json";
+const munichCityscape = munichFacade;
 
 
 export const Route = createFileRoute("/")({
