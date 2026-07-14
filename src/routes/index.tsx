@@ -111,7 +111,7 @@ function Home() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="mb-6 font-mono text-[11px] font-medium uppercase tracking-editorial text-teal"
             >
-              Computational Tax Intelligence · v0.1
+              Computational Tax Intelligence
             </motion.p>
             <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
               Navigate borders.
