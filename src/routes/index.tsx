@@ -4,9 +4,16 @@ import { useRef } from "react";
 import { ArrowRight, ArrowDown, ShieldCheck, GitBranch, LineChart } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
-import heroImage from "@/assets/network-city.jpg.asset.json";
 import munichFacade from "@/assets/munich-facade.jpg.asset.json";
-import munichOlympia from "@/assets/munich-olympiapark.jpg.asset.json";
+
+// Realistic corporate finance photography — Germany-anchored
+const heroImage = {
+  url: "https://images.unsplash.com/photo-1527409030417-70ceafcf6a1c?auto=format&fit=crop&w=2000&q=85",
+};
+const munichCityscape = {
+  url: "https://images.unsplash.com/photo-1599982890963-3aebbf3c2d05?auto=format&fit=crop&w=1600&q=85",
+};
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
