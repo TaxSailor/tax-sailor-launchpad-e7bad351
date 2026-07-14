@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, LayoutDashboard, UserCircle } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, UserCircle, ShieldCheck } from "lucide-react";
 import { LogoLockup } from "./Logo";
 import { useSession, logout } from "@/lib/auth/session";
 import {
