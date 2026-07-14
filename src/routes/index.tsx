@@ -97,9 +97,15 @@ function Home() {
         </motion.div>
 
         <motion.div
-          className="container-full relative flex h-full flex-col justify-end pb-16 pt-24 md:pb-24"
+          className="container-full relative flex h-full flex-col justify-center py-24 md:py-28"
           style={{ opacity: heroOpacity }}
         >
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: easeOut }}
+            className="max-w-3xl lg:max-w-4xl"
+          >
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
