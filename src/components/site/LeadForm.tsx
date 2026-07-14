@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import {
   Dialog,
   DialogContent,
@@ -9,10 +8,36 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { submitLead } from "@/lib/leads.functions";
+import { api } from "@/lib/api";
 import { Check } from "lucide-react";
 
 type Audience = "investors" | "pilot" | "corporations" | "individuals" | "general";
+
+type LeadPayload = {
+  audience: Audience;
+  name: string;
+  email: string;
+  company?: string;
+  message?: string;
+  source_path?: string;
+};
+
+async function submitLead(payload: LeadPayload) {
+  // FastAPI backend: POST /api/leads/pricing (see src/api/routers/leads.py).
+  // We pass audience as the tier_id so sales sees which surface it came from.
+  return api.post<{ id: string; created_at: string }>(
+    "/api/leads/pricing",
+    {
+      name: payload.name,
+      email: payload.email,
+      company: payload.company || undefined,
+      tier_id: payload.audience,
+      message: payload.message || `Lead from ${payload.source_path ?? "unknown"}`,
+    },
+    { mock: () => ({ id: `mock-${Date.now()}`, created_at: new Date().toISOString() }) },
+  );
+}
+
 
 const audienceCopy: Record<Audience, { title: string; description: string; cta: string }> = {
   investors: {
