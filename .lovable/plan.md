@@ -1,69 +1,107 @@
 
-Implement the "Scientific Ledger" direction as the full TaxSailor site. Locked tokens: navy `#052347`, teal `#14b8a6`, ghost `#f4f6fa`, white; Libre Baskerville (serif headlines), IBM Plex Sans (body), IBM Plex Mono (numbers, equations, meta). Full-width stacked bands, editorial spacing, no dark AI-slop gradients.
+# Redesign plan — full TaxSailor app on Scientific Ledger
 
-## 1. Design tokens & fonts
+## What's in the private repo (source of truth)
 
-- Update `src/styles.css`: replace shadcn light tokens with navy/teal/ghost palette in oklch; register `--font-serif`, `--font-sans`, `--font-mono`; keep dark-mode block but off by default (site is light-only).
-- Load Libre Baskerville + IBM Plex Sans + IBM Plex Mono via `<link>` tags in `src/routes/__root.tsx` head (never `@import` in styles.css).
-- Add audience accent tokens: `--accent-investors` (teal), `--accent-pilot` (emerald `#10b981`), `--accent-corporations` (steel `#64748b`), `--accent-individuals` (amber `#c9822a`).
+Backend (`src/api/` — FastAPI on Render service `taxsailor-web`, `/api/*` prefix):
+- Routers: `auth.py`, `oauth.py`, `account.py`, `leads.py`, `events.py`
+- Engine: `src/core/` (Dijkstra tax route optimizer, treaty data)
+- DB: `tax_database.db` (SQLite in repo; Postgres in prod)
 
-## 2. Shared shell
+Frontend (`frontend/src/` — React SPA + react-router-dom):
+- Routes: `/`, `/demo`, `/workspace`, `/pricing`, `/account`, `/login`
+- Features: auth (magic link, email/pw, Google + Facebook OAuth), account (profile, avatar, GDPR export, run history, subscription), pricing/paywall, workspace (scenario picker → guided questionnaire → simulation), results (RouteFlowChart, ComparisonTable, evidence panel, PDF export), assistant chat, demo QR flow
 
-- `src/components/site/Nav.tsx` — sticky, blurred, TaxSailor sail-icon logo (inline SVG derived from uploaded logo), links: Technology / Audience / Roadmap / About / Contact + primary CTA "Access Platform".
-- `src/components/site/Footer.tsx` — matches direction footer.
-- `src/components/site/Logo.tsx` — reusable inline SVG mark (navy fill, teal accent).
-- `src/components/site/RouteGraph.tsx` — animated SVG route-graph (nodes lighting up sequentially) used in hero. Pure CSS/SVG animation, no framer-motion needed for this piece.
-- `src/components/site/StatBar.tsx` — 131 / 438 / 3,000+ / 50+ trust bar; scroll-triggered count-up via `IntersectionObserver` + `requestAnimationFrame`.
-- Wrap `<Outlet />` in `src/routes/__root.tsx` with the nav + footer so every page shares them.
+Docs (`docs/product/`, `docs/business/`, `docs/*.tex`):
+- Phase 31–33 sprint plans, E2E matrices, security review, WhitePaper.tex, Tech_Sprint_Documentation.tex
 
-## 3. Homepage (`/`)
+## Strategy — the split
 
-Rebuild `src/routes/index.tsx` matching Scientific Ledger composition exactly:
-Hero (split 50/50, headline left + route-graph right) → navy trust bar → audience router (4 cards, `bg-navy/10` hairline separators) → Algorithmic Kernel band (equation W = −ln(1 − τ) in navy panel) → Roadmap (4 columns, teal border-left on current milestone) → Team (navy background, 4 headshots imported from uploads) → Lead-capture CTA card → footer. Real copy from PDFs/sprint doc.
+- **Keep FastAPI backend on Render, untouched.** It's the tax engine, the source of correctness, and it already has auth, OAuth, treaties, and the Dijkstra kernel. Rebuilding that on Lovable Cloud would take months and risk correctness regressions on the exact thing you're pitching investors.
+- **Rebuild `frontend/` here on Scientific Ledger.** This Lovable project becomes the new frontend. It talks to `https://<render-host>/api/*` via a `VITE_API_BASE_URL` env var. On merge, the new build replaces the Render service's static frontend.
+- **Drop Lovable Cloud auth / `leads` table from this project.** Your real backend already owns auth, users, and leads. Keep the Lovable-Cloud lead form only if you want a marketing shadow list; otherwise remove it and point the marketing forms at `/api/leads` too. (Decision needed — see Open questions.)
 
-## 4. Audience subpages (same shell, accent varies)
+## Route inventory to build
 
-- `src/routes/investors.tsx` — teal accent. Hero + thesis (€105k→€1.8M projection), traction, ask, "Book investor call" CTA.
-- `src/routes/pilot.tsx` — emerald accent. Deliverables, pricing bands €149 / €249 / €499 (IBM Plex Mono), 30-day free pilot, "Request pilot access" form.
-- `src/routes/corporations.tsx` — steel accent. Use cases (WHT, Pillar Two, transfer pricing), integration story, "Book demo" CTA.
-- `src/routes/individuals.tsx` — amber accent. Personas (§6 AStG, §2 AStG, ErbStG scenarios), calculator teaser, "Get started" CTA.
+Marketing (already partially done here — refine, don't rebuild):
+- `/` (home), `/about`, `/contact`, `/investors`, `/pilot`, `/corporations`, `/individuals`, `/sitemap.xml`
 
-Each route sets its own `head()` with unique title, description, og:title, og:description, canonical, og:url.
+App shell (new — port from `frontend/src/`):
+- `/login` — email/pw + magic link + Google + Facebook (mirrors `AuthPage.tsx`)
+- `/signup` — new (repo uses `/login` for both; we'll split)
+- `/auth/callback` — OAuth landing
+- `/demo` — QR-gated demo scenario preview (mirrors demo flow)
+- `/workspace` — scenario picker + guided questionnaire + simulation runner
+- `/workspace/results/$runId` — RouteFlowChart, ComparisonTable, evidence panel, PDF export
+- `/pricing` — plan tiers + upgrade CTA (mirrors `PricingPage`)
+- `/account` — profile, avatar upload, run history, subscription, GDPR export/delete (mirrors `AccountPage`)
+- `/assistant` — chat UI wired to backend assistant endpoint
 
-## 5. About + Contact
+Protected routes live under `_authenticated/` layout with a guard that redirects to `/login`.
 
-- `src/routes/about.tsx` — mission, four team headshots (imported from `user-uploads://`), anti-pattern grid ("we are not…"), team bios pulled from sprint doc.
-- `src/routes/contact.tsx` — segmented email addresses + one shared form.
+## Design system continuity
 
-## 6. Lead capture wired to Cloud
+- Everything uses the locked Scientific Ledger tokens: navy `#052347`, teal `#14b8a6`, ghost `#f4f6fa`, Libre Baskerville / IBM Plex Sans / IBM Plex Mono.
+- Audience accents remain per-marketing-page.
+- App shell (workspace, results, account) gets its own subtle chrome variant: navy sidebar, white canvas, teal action color — still the same tokens, just denser.
+- Data viz (RouteFlowChart, MathProofTable, PlotlyChart) restyled with tokens instead of default Plotly palette.
 
-- Migration: create `public.leads` (id, audience, name, email, company, message, created_at) with grants + RLS. Public insert allowed; select restricted to authenticated admin.
-- Server function `submitLead` in `src/lib/leads.functions.ts` — Zod-validates input, inserts via server publishable client, returns `{ok:true}`.
-- `src/components/site/LeadForm.tsx` — accepts `audience` prop, uses `useServerFn` + `useMutation`, shows success/error states.
-- Replace every "Request pilot / Book call / Book demo" button with a modal opening the `<LeadForm>` scoped to the page's audience. (No email notification wiring in this pass — the leads table is the deliverable; email can be added later via a trigger.)
+## Phased build (proposed)
 
-## 7. Assets
+Phase A — API client + auth (foundation, ~1 build session)
+- `src/lib/api.ts`: typed fetch client with `VITE_API_BASE_URL`, credentials, CSRF handling
+- `src/lib/auth/`: session hook (`useSession`) reading from backend, `_authenticated` layout guard
+- `/login`, `/signup`, `/auth/callback` routes, real Google + Facebook buttons hitting `/api/oauth/*`
+- Magic link redemption route
 
-- Copy the 4 team headshots + logo SVG from `user-uploads://` into `src/assets/` as static imports.
-- Team photos render grayscale by default, color on hover (matches direction).
-- Favicon: replace `public/favicon.ico` — skip in this pass unless quick; keep default.
+Phase B — Workspace + results (the product core)
+- `/workspace` scenario picker + guided questionnaire (port `ScenarioGuidedQuestionnaire`)
+- Simulation submit → results route
+- `RouteFlowChart`, `RouteComparisonTable`, `LegalEvidencePanel`, `MathProofTable` restyled
+- PDF export button (reuse `advisorPdfExport.ts`)
 
-## 8. SEO plumbing
+Phase C — Account + pricing + paywall
+- `/account`: profile, avatar upload, run history, subscription, GDPR
+- `/pricing` + gating banners + upgrade CTA source tracking
 
-- Per-route `head()` with title/description/og/canonical (relative paths — no domain yet).
-- Root `head()` keeps sitewide defaults; remove "Lovable App" placeholder.
-- Add `src/routes/sitemap[.]xml.ts` server route enumerating all 7 routes.
-- Add `public/robots.txt` with `Allow: /`.
+Phase D — Assistant chat + demo QR
+- `/assistant` chat UI wired to backend
+- `/demo` QR-redeem flow
 
-## 9. Responsive & QA
+Phase E — Docs surface (from `.tex` + `.md`)
+- `/docs` or `/whitepaper` route rendering `WhitePaper.tex` + `Tech_Sprint_Documentation.tex` (converted MD or PDF hosted)
+- Optional; can defer if fundraise timeline is tight
 
-- All layouts use the grid+`min-w-0`+`shrink-0` pattern for header rows.
-- Verify at 375 / 768 / 1024 / 1440 via Playwright screenshots after build; iterate on any clipping.
+Phase F — Cutover
+- Set `VITE_API_BASE_URL` to prod Render host
+- Build → the resulting `dist/` replaces `frontend/dist/` on Render
+- Update `render.yaml` static path if needed
+- DNS stays on `taxsailor.com`
 
-## 10. Out of scope this pass
+Each phase merges to GitHub via the existing Lovable ↔ GitHub sync on this project's own repo, not the TaxSailor monorepo. **Handoff option**: at the end I emit a PR-shaped diff you copy into the TaxSailor repo, replacing `frontend/`.
 
-- Email-on-submit notification (add later via Cloud trigger or Resend).
-- GitHub OAuth: still user-triggered from Plus menu, unchanged.
-- OG images: skip until domain is set.
+## Technical notes
 
-Deliverable: full 7-route responsive site running on locked design tokens with real lead-capture into Cloud.
+- **CORS**: FastAPI's `cors.py` will need the Lovable preview origin added (for dev). Prod is same-origin under Render.
+- **Auth cookies**: backend sets `httpOnly` session cookies; frontend uses `credentials: "include"`. No token storage in JS.
+- **OAuth redirect URIs**: register the Lovable preview URL as an allowed redirect in Google + Facebook consoles for staging.
+- **File uploads** (avatar, evidence PDFs): multipart POST to `/api/account/avatar` — no Lovable storage buckets needed.
+- **PDF export**: existing `advisorPdfExport.ts` uses jsPDF client-side; portable as-is.
+- **Framework mismatch**: source is Vite + react-router-dom; target is TanStack Start (SSR + file routing). We port components 1:1 but rewrite routing.
+- **Testing**: repo has extensive `*.test.ts` files. We don't port those in this pass; they belong to the monorepo's Vitest runner. We spot-check with Playwright screenshots during build.
+
+## Open questions before Phase A
+
+1. **Lead capture**: keep the Lovable Cloud `leads` table for marketing forms, or point marketing forms at `/api/leads` on Render so all leads land in one DB? (Recommend: point everything at `/api/leads`.)
+2. **OAuth in staging**: do you want me to wire Google + Facebook to hit the Render prod backend from the Lovable preview (needs redirect URIs added), or mock auth in preview and only wire real OAuth after cutover?
+3. **Cutover mechanism**: do you want the new frontend to fully replace `frontend/` in the TaxSailor monorepo (I emit a diff you PR), or run side-by-side on a subdomain like `app.taxsailor.com` while you A/B?
+4. **Docs page**: build `/whitepaper` from `WhitePaper.tex` in this pass, or defer until after fundraise?
+5. **Scope trim**: if 6 weeks feels long, which phase can we cut or defer? (My vote: defer Phase E docs and Phase D assistant chat — do A/B/C only for a fundraise-ready cutover.)
+
+## Out of scope this plan
+
+- No backend changes (FastAPI, Dijkstra engine, treaty data).
+- No Lovable Cloud Postgres migration of user data.
+- No new tax logic, no new jurisdictions.
+- No mobile app.
+- No CI/CD pipeline changes on Render.
