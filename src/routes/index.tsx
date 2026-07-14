@@ -114,7 +114,7 @@ function Home() {
             >
               Computational Tax Intelligence
             </motion.p>
-            <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
+            <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-6xl lg:text-7xl xl:text-8xl">
               Navigate borders.
               <br />
               <span className="italic font-normal text-teal">Keep more.</span>
