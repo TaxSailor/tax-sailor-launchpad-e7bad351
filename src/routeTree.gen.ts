@@ -22,7 +22,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedWorkspaceScenarioScenarioIdRouteImport } from './routes/_authenticated/workspace.scenario.$scenarioId'
 import { Route as AuthenticatedWorkspaceResultsRunIdRouteImport } from './routes/_authenticated/workspace.results.$runId'
@@ -91,9 +93,19 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAssistantRoute = ApiAssistantRouteImport.update({
+  id: '/api/assistant',
+  path: '/api/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
   id: '/workspace',
   path: '/workspace',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
@@ -127,7 +139,9 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -145,7 +159,9 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -165,7 +181,9 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/_authenticated/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -185,7 +203,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/account'
+    | '/admin'
     | '/workspace'
+    | '/api/assistant'
     | '/auth/callback'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
@@ -203,7 +223,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/account'
+    | '/admin'
     | '/workspace'
+    | '/api/assistant'
     | '/auth/callback'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
@@ -222,7 +244,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/_authenticated/account'
+    | '/_authenticated/admin'
     | '/_authenticated/workspace'
+    | '/api/assistant'
     | '/auth/callback'
     | '/_authenticated/workspace/results/$runId'
     | '/_authenticated/workspace/scenario/$scenarioId'
@@ -241,6 +265,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiAssistantRoute: typeof ApiAssistantRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
@@ -337,11 +362,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/assistant': {
+      id: '/api/assistant'
+      path: '/api/assistant'
+      fullPath: '/api/assistant'
+      preLoaderRoute: typeof ApiAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/workspace': {
       id: '/_authenticated/workspace'
       path: '/workspace'
       fullPath: '/workspace'
       preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/account': {
@@ -388,11 +427,13 @@ const AuthenticatedWorkspaceRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
 }
 
@@ -412,6 +453,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiAssistantRoute: ApiAssistantRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

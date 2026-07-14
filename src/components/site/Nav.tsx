@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, LayoutDashboard, UserCircle } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, UserCircle, ShieldCheck } from "lucide-react";
 import { LogoLockup } from "./Logo";
 import { useSession, logout } from "@/lib/auth/session";
 import {
@@ -81,6 +81,11 @@ export function Nav() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/account" })}>
                   <UserCircle className="mr-2 size-4" /> Account
                 </DropdownMenuItem>
+                {user?.role === "admin" && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
+                    <ShieldCheck className="mr-2 size-4" /> Admin
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={async () => {
                     await logout();
