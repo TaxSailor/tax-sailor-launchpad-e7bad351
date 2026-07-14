@@ -236,7 +236,7 @@ function Home() {
               Select your route
             </p>
             <h2 className="mx-auto max-w-2xl font-serif text-4xl leading-[1.1] text-navy md:text-5xl">
-              Four audiences. <span className="italic">One graph.</span>
+              Four routes. <span className="italic">One graph.</span>
             </h2>
           </motion.div>
 
