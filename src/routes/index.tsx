@@ -4,9 +4,16 @@ import { useRef } from "react";
 import { ArrowRight, ArrowDown, ShieldCheck, GitBranch, LineChart } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
-import heroImage from "@/assets/network-city.jpg.asset.json";
 import munichFacade from "@/assets/munich-facade.jpg.asset.json";
-import munichOlympia from "@/assets/munich-olympiapark.jpg.asset.json";
+
+// Realistic corporate finance photography — Germany-anchored
+const heroImage = {
+  url: "https://images.unsplash.com/photo-1527409030417-70ceafcf6a1c?auto=format&fit=crop&w=2000&q=85",
+};
+const munichCityscape = {
+  url: "https://images.unsplash.com/photo-1599982890963-3aebbf3c2d05?auto=format&fit=crop&w=1600&q=85",
+};
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,7 +44,7 @@ const audiences = [
     title: "Fund the graph",
     body: "Seed round underway. €105k friends-and-family closed. Data room, thesis, and traction on request.",
     image:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=85",
   },
   {
     to: "/pilot" as const,
@@ -45,7 +52,7 @@ const audiences = [
     title: "The Q3 2026 pilot",
     body: "5–10 boutique DACH advisory firms. 30-day free pilot. Then €149 / €249 / €499 per seat.",
     image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=85",
   },
   {
     to: "/corporations" as const,
@@ -53,7 +60,7 @@ const audiences = [
     title: "WHT · Pillar Two",
     body: "Group-level withholding, treaty routing, and OECD compliance across 131 jurisdictions.",
     image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?auto=format&fit=crop&w=1200&q=85",
   },
   {
     to: "/individuals" as const,
@@ -61,7 +68,8 @@ const audiences = [
     title: "Residency & estate",
     body: "§6 AStG exit, §2 AStG extended limited, ErbStG cross-border. Math you can audit.",
     image:
-      "https://images.unsplash.com/photo-1573497491765-dccce02b29df?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=85",
+
   },
 ];
 
@@ -380,8 +388,9 @@ function Home() {
               className="image-reveal relative order-1 aspect-[4/3] overflow-hidden md:order-2"
             >
               <img
-                src={munichOlympia.url}
-                alt="Munich skyline"
+                src={munichCityscape.url}
+                alt="Munich rooftops and Frauenkirche"
+
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
