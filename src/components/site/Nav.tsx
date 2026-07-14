@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, UserCircle } from "lucide-react";
 import { LogoLockup } from "./Logo";
 import { useSession, logout } from "@/lib/auth/session";
 import {
@@ -17,6 +17,7 @@ const links = [
   { to: "/pilot", label: "Pilot" },
   { to: "/corporations", label: "Corporations" },
   { to: "/individuals", label: "Individuals" },
+  { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;
@@ -76,6 +77,9 @@ export function Nav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate({ to: "/workspace" })}>
                   <LayoutDashboard className="mr-2 size-4" /> Workspace
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/account" })}>
+                  <UserCircle className="mr-2 size-4" /> Account
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={async () => {

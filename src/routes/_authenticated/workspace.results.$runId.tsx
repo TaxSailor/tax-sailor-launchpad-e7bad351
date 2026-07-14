@@ -110,6 +110,37 @@ function ResultsPage() {
         </ul>
       </div>
 
+      <div className="mt-10 rounded-sm border-2 border-teal/40 bg-teal/5 p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-widest text-teal">
+              Preview run
+            </p>
+            <h3 className="mt-1 font-serif text-xl text-navy">
+              Unlock the full report and legal appendix
+            </h3>
+            <p className="mt-1 text-sm text-navy/70">
+              Consumer reports from €99. Advisor licences from €199/mo. Watermark removed, top-20
+              alternative routes, and export-ready deliverables.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/pricing"
+              className="rounded-sm bg-navy px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
+            >
+              View plans
+            </Link>
+            <Link
+              to="/account"
+              className="rounded-sm border border-navy/20 bg-white px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-navy hover:border-teal hover:text-teal"
+            >
+              Manage account
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-8 flex flex-wrap gap-3">
         <button
           onClick={() => window.print()}

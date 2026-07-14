@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvestorsRouteImport } from './routes/investors'
@@ -22,6 +23,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedWorkspaceScenarioScenarioIdRouteImport } from './routes/_authenticated/workspace.scenario.$scenarioId'
 import { Route as AuthenticatedWorkspaceResultsRunIdRouteImport } from './routes/_authenticated/workspace.results.$runId'
 
@@ -33,6 +35,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PilotRoute = PilotRouteImport.update({
@@ -89,6 +96,11 @@ const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
   path: '/workspace',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWorkspaceScenarioScenarioIdRoute =
   AuthenticatedWorkspaceScenarioScenarioIdRouteImport.update({
     id: '/scenario/$scenarioId',
@@ -111,8 +123,10 @@ export interface FileRoutesByFullPath {
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
@@ -127,8 +141,10 @@ export interface FileRoutesByTo {
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
@@ -145,8 +161,10 @@ export interface FileRoutesById {
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
@@ -163,8 +181,10 @@ export interface FileRouteTypes {
     | '/investors'
     | '/login'
     | '/pilot'
+    | '/pricing'
     | '/signup'
     | '/sitemap.xml'
+    | '/account'
     | '/workspace'
     | '/auth/callback'
     | '/workspace/results/$runId'
@@ -179,8 +199,10 @@ export interface FileRouteTypes {
     | '/investors'
     | '/login'
     | '/pilot'
+    | '/pricing'
     | '/signup'
     | '/sitemap.xml'
+    | '/account'
     | '/workspace'
     | '/auth/callback'
     | '/workspace/results/$runId'
@@ -196,8 +218,10 @@ export interface FileRouteTypes {
     | '/investors'
     | '/login'
     | '/pilot'
+    | '/pricing'
     | '/signup'
     | '/sitemap.xml'
+    | '/_authenticated/account'
     | '/_authenticated/workspace'
     | '/auth/callback'
     | '/_authenticated/workspace/results/$runId'
@@ -214,6 +238,7 @@ export interface RootRouteChildren {
   InvestorsRoute: typeof InvestorsRoute
   LoginRoute: typeof LoginRoute
   PilotRoute: typeof PilotRoute
+  PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -233,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pilot': {
@@ -312,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/workspace/scenario/$scenarioId': {
       id: '/_authenticated/workspace/scenario/$scenarioId'
       path: '/scenario/$scenarioId'
@@ -348,10 +387,12 @@ const AuthenticatedWorkspaceRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
 }
 
@@ -368,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestorsRoute: InvestorsRoute,
   LoginRoute: LoginRoute,
   PilotRoute: PilotRoute,
+  PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,
