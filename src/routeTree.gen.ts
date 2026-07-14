@@ -16,6 +16,7 @@ import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as IndividualsRouteImport } from './routes/individuals'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as CorporationsRouteImport } from './routes/corporations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
@@ -62,6 +63,11 @@ const InvestorsRoute = InvestorsRouteImport.update({
 const IndividualsRoute = IndividualsRouteImport.update({
   id: '/individuals',
   path: '/individuals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CorporationsRoute = CorporationsRouteImport.update({
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/docs': typeof DocsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/docs': typeof DocsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/docs': typeof DocsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/docs'
     | '/individuals'
     | '/investors'
     | '/login'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/docs'
     | '/individuals'
     | '/investors'
     | '/login'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/docs'
     | '/individuals'
     | '/investors'
     | '/login'
@@ -258,6 +270,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   CorporationsRoute: typeof CorporationsRoute
+  DocsRoute: typeof DocsRoute
   IndividualsRoute: typeof IndividualsRoute
   InvestorsRoute: typeof InvestorsRoute
   LoginRoute: typeof LoginRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/individuals'
       fullPath: '/individuals'
       preLoaderRoute: typeof IndividualsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/corporations': {
@@ -446,6 +466,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   CorporationsRoute: CorporationsRoute,
+  DocsRoute: DocsRoute,
   IndividualsRoute: IndividualsRoute,
   InvestorsRoute: InvestorsRoute,
   LoginRoute: LoginRoute,
