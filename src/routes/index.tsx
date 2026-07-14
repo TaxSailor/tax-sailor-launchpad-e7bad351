@@ -81,7 +81,7 @@ function Home() {
       {/* HERO — full-viewport editorial */}
       <section
         ref={heroRef}
-        className="relative -mt-16 h-[100svh] overflow-hidden"
+        className="relative h-[calc(100svh-4rem)] min-h-[640px] overflow-hidden"
       >
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
           <img
