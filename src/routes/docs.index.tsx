@@ -75,7 +75,7 @@ function DocsIndex() {
         })}
 
         {filtered.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-navy/15 bg-canvas p-12 text-center">
+          <div className="rounded-2xl border border-dashed border-navy/15 bg-ghost p-12 text-center">
             <p className="font-serif text-lg text-navy">No articles match "{q}".</p>
             <p className="mt-2 font-sans text-sm text-navy/60">
               Try a different search, or <Link to="/contact" className="text-teal underline">ask us directly</Link>.

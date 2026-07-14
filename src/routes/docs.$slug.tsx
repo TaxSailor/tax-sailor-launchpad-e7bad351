@@ -71,8 +71,8 @@ function ArticlePage() {
                   key={a.slug}
                   to="/docs/$slug"
                   params={{ slug: a.slug }}
-                  className="rounded-md px-2 py-1.5 font-sans text-sm text-navy/60 transition-colors hover:bg-canvas hover:text-navy"
-                  activeProps={{ className: "bg-canvas text-navy font-medium" }}
+                  className="rounded-md px-2 py-1.5 font-sans text-sm text-navy/60 transition-colors hover:bg-ghost hover:text-navy"
+                  activeProps={{ className: "bg-ghost text-navy font-medium" }}
                 >
                   {a.title}
                 </Link>
@@ -98,7 +98,7 @@ function ArticlePage() {
                 ul: ({ node, ...p }) => <ul className="my-4 grid gap-2 pl-5 list-disc marker:text-teal" {...p} />,
                 ol: ({ node, ...p }) => <ol className="my-4 grid gap-2 pl-5 list-decimal marker:text-teal" {...p} />,
                 li: ({ node, ...p }) => <li className="pl-1" {...p} />,
-                code: ({ node, ...p }) => <code className="rounded bg-canvas px-1.5 py-0.5 font-mono text-[13px] text-navy" {...p} />,
+                code: ({ node, ...p }) => <code className="rounded bg-ghost px-1.5 py-0.5 font-mono text-[13px] text-navy" {...p} />,
                 hr: () => <hr className="my-8 border-navy/10" />,
               }}
             >{article.body}</ReactMarkdown>

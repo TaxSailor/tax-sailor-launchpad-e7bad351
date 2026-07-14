@@ -16,7 +16,7 @@ export const Route = createFileRoute("/docs")({
 function DocsLayout() {
   return (
     <div className="bg-white">
-      <div className="border-b border-navy/10 bg-canvas px-6 py-10">
+      <div className="border-b border-navy/10 bg-ghost px-6 py-10">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-teal">Documentation</p>
