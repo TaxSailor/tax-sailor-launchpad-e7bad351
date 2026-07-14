@@ -69,10 +69,9 @@ const audienceCopy: Record<Audience, { title: string; description: string; cta: 
 
 export function LeadForm({ audience, onSuccess }: { audience: Audience; onSuccess?: () => void }) {
   const copy = audienceCopy[audience];
-  const submit = useServerFn(submitLead);
   const [done, setDone] = useState(false);
   const mutation = useMutation({
-    mutationFn: submit,
+    mutationFn: submitLead,
     onSuccess: () => {
       setDone(true);
       onSuccess?.();
@@ -100,14 +99,12 @@ export function LeadForm({ audience, onSuccess }: { audience: Audience; onSucces
         e.preventDefault();
         const f = new FormData(e.currentTarget);
         mutation.mutate({
-          data: {
-            audience,
-            name: String(f.get("name") ?? ""),
-            email: String(f.get("email") ?? ""),
-            company: String(f.get("company") ?? ""),
-            message: String(f.get("message") ?? ""),
-            source_path: typeof window !== "undefined" ? window.location.pathname : undefined,
-          },
+          audience,
+          name: String(f.get("name") ?? ""),
+          email: String(f.get("email") ?? ""),
+          company: String(f.get("company") ?? ""),
+          message: String(f.get("message") ?? ""),
+          source_path: typeof window !== "undefined" ? window.location.pathname : undefined,
         });
       }}
     >
