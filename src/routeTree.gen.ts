@@ -23,6 +23,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
@@ -100,6 +101,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsSlugRoute = DocsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => DocsRoute,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
   '/docs': typeof DocsIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
   '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/_authenticated/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
     | '/docs/'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
     | '/docs'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
     | '/docs/'
     | '/_authenticated/workspace/results/$runId'
     | '/_authenticated/workspace/scenario/$scenarioId'
@@ -392,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/$slug': {
+      id: '/docs/$slug'
+      path: '/$slug'
+      fullPath: '/docs/$slug'
+      preLoaderRoute: typeof DocsSlugRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -478,10 +497,12 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DocsRouteChildren {
+  DocsSlugRoute: typeof DocsSlugRoute
   DocsIndexRoute: typeof DocsIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
+  DocsSlugRoute: DocsSlugRoute,
   DocsIndexRoute: DocsIndexRoute,
 }
 
