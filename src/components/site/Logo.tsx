@@ -1,19 +1,35 @@
 export function Logo({ className = "size-8", accent = "var(--teal)" }: { className?: string; accent?: string }) {
   return (
     <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <rect width="40" height="40" rx="6" fill="var(--navy)" />
-      {/* Sail */}
-      <path d="M20 8 L20 24 L28 24 Z" fill="#ffffff" />
-      <path d="M20 12 L14 24 L20 24 Z" fill="#ffffff" opacity="0.85" />
-      {/* Constellation waypoint route */}
-      <g stroke={accent} strokeWidth="1.2" fill={accent}>
-        <line x1="10" y1="30" x2="18" y2="28" />
-        <line x1="18" y1="28" x2="24" y2="30" />
-        <line x1="24" y1="30" x2="30" y2="28" />
-        <circle cx="10" cy="30" r="1.6" />
-        <circle cx="18" cy="28" r="1.6" />
-        <circle cx="24" cy="30" r="1.6" />
-        <circle cx="30" cy="28" r="1.6" />
+      {/* Rounded navy tile */}
+      <rect width="40" height="40" rx="8" fill="var(--navy)" />
+      {/* Mast */}
+      <line x1="20" y1="7" x2="20" y2="29" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" />
+      {/* Main sail — curved leech for wind */}
+      <path
+        d="M20.8 8 C 27 14, 28.5 20, 27.8 24.4 L 20.8 24.4 Z"
+        fill="#ffffff"
+      />
+      {/* Fore sail (jib) */}
+      <path
+        d="M19.2 11 C 15 16, 13.8 20.5, 14 24.4 L 19.2 24.4 Z"
+        fill="#ffffff"
+        opacity="0.72"
+      />
+      {/* Hull — thin arc */}
+      <path
+        d="M9 27.5 Q 20 33, 31 27.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      {/* Waypoint star at masthead */}
+      <circle cx="20" cy="7" r="1.6" fill={accent} />
+      {/* Waterline waypoints */}
+      <g fill={accent}>
+        <circle cx="12" cy="30.2" r="1.1" />
+        <circle cx="28" cy="30.2" r="1.1" />
       </g>
     </svg>
   );
