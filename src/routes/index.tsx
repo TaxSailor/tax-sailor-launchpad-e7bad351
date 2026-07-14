@@ -6,10 +6,11 @@ import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
 import heroImage from "@/assets/frankfurt-skyline.jpg.asset.json";
 import munichFacade from "@/assets/munich-city.jpg.asset.json";
-import audInvestors from "@/assets/audience-investors.jpg.asset.json";
+import audInvestors from "@/assets/audience-investors-new.jpg.asset.json";
 import audAdvisory from "@/assets/audience-advisory.jpg.asset.json";
-import audCorporations from "@/assets/audience-corporations.jpg.asset.json";
-import audIndividuals from "@/assets/audience-individuals.jpg.asset.json";
+import audCorporations from "@/assets/audience-corporations-new.jpg.asset.json";
+import audIndividuals from "@/assets/audience-individuals-new.jpg.asset.json";
+import { RouteGraph } from "@/components/site/RouteGraph";
 const munichCityscape = munichFacade;
 
 
