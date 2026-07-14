@@ -10,22 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PilotRouteImport } from './routes/pilot'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as IndividualsRouteImport } from './routes/individuals'
 import { Route as CorporationsRouteImport } from './routes/corporations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PilotRoute = PilotRouteImport.update({
   id: '/pilot',
   path: '/pilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvestorsRoute = InvestorsRouteImport.update({
@@ -53,10 +68,24 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -66,8 +95,12 @@ export interface FileRoutesByFullPath {
   '/corporations': typeof CorporationsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
+  '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/workspace': typeof AuthenticatedWorkspaceRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,19 +109,28 @@ export interface FileRoutesByTo {
   '/corporations': typeof CorporationsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
+  '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/workspace': typeof AuthenticatedWorkspaceRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
+  '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,8 +141,12 @@ export interface FileRouteTypes {
     | '/corporations'
     | '/individuals'
     | '/investors'
+    | '/login'
     | '/pilot'
+    | '/signup'
     | '/sitemap.xml'
+    | '/workspace'
+    | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,29 +155,42 @@ export interface FileRouteTypes {
     | '/corporations'
     | '/individuals'
     | '/investors'
+    | '/login'
     | '/pilot'
+    | '/signup'
     | '/sitemap.xml'
+    | '/workspace'
+    | '/auth/callback'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/contact'
     | '/corporations'
     | '/individuals'
     | '/investors'
+    | '/login'
     | '/pilot'
+    | '/signup'
     | '/sitemap.xml'
+    | '/_authenticated/workspace'
+    | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   CorporationsRoute: typeof CorporationsRoute
   IndividualsRoute: typeof IndividualsRoute
   InvestorsRoute: typeof InvestorsRoute
+  LoginRoute: typeof LoginRoute
   PilotRoute: typeof PilotRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -143,11 +202,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pilot': {
       id: '/pilot'
       path: '/pilot'
       fullPath: '/pilot'
       preLoaderRoute: typeof PilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/investors': {
@@ -185,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -192,18 +272,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/workspace': {
+      id: '/_authenticated/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   CorporationsRoute: CorporationsRoute,
   IndividualsRoute: IndividualsRoute,
   InvestorsRoute: InvestorsRoute,
+  LoginRoute: LoginRoute,
   PilotRoute: PilotRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
