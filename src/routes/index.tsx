@@ -41,33 +41,28 @@ const audiences = [
     kicker: "For Investors",
     title: "Fund the graph",
     body: "Seed round underway. €105k friends-and-family closed. Data room, thesis, and traction on request.",
-    image:
-      "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=85",
+    image: audInvestors.url,
   },
   {
     to: "/pilot" as const,
     kicker: "For Advisory Firms",
     title: "The Q3 2026 pilot",
     body: "5–10 boutique DACH advisory firms. 30-day free pilot. Then €149 / €249 / €499 per seat.",
-    image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=85",
+    image: audAdvisory.url,
   },
   {
     to: "/corporations" as const,
     kicker: "For Corporations",
     title: "WHT · Pillar Two",
     body: "Group-level withholding, treaty routing, and OECD compliance across 131 jurisdictions.",
-    image:
-      "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?auto=format&fit=crop&w=1200&q=85",
+    image: audCorporations.url,
   },
   {
     to: "/individuals" as const,
     kicker: "For Individuals",
     title: "Residency & estate",
     body: "§6 AStG exit, §2 AStG extended limited, ErbStG cross-border. Math you can audit.",
-    image:
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=85",
-
+    image: audIndividuals.url,
   },
 ];
 
