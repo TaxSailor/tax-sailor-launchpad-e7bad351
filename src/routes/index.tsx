@@ -4,15 +4,13 @@ import { useRef } from "react";
 import { ArrowRight, ArrowDown, ShieldCheck, GitBranch, LineChart } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
-import munichFacade from "@/assets/munich-facade.jpg.asset.json";
-
-// Realistic corporate finance photography — Germany-anchored
-const heroImage = {
-  url: "https://images.unsplash.com/photo-1527409030417-70ceafcf6a1c?auto=format&fit=crop&w=2000&q=85",
-};
-const munichCityscape = {
-  url: "https://images.unsplash.com/photo-1599982890963-3aebbf3c2d05?auto=format&fit=crop&w=1600&q=85",
-};
+import heroImage from "@/assets/frankfurt-skyline.jpg.asset.json";
+import munichFacade from "@/assets/munich-city.jpg.asset.json";
+import audInvestors from "@/assets/audience-investors.jpg.asset.json";
+import audAdvisory from "@/assets/audience-advisory.jpg.asset.json";
+import audCorporations from "@/assets/audience-corporations.jpg.asset.json";
+import audIndividuals from "@/assets/audience-individuals.jpg.asset.json";
+const munichCityscape = munichFacade;
 
 
 export const Route = createFileRoute("/")({
@@ -43,33 +41,28 @@ const audiences = [
     kicker: "For Investors",
     title: "Fund the graph",
     body: "Seed round underway. €105k friends-and-family closed. Data room, thesis, and traction on request.",
-    image:
-      "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=85",
+    image: audInvestors.url,
   },
   {
     to: "/pilot" as const,
     kicker: "For Advisory Firms",
     title: "The Q3 2026 pilot",
     body: "5–10 boutique DACH advisory firms. 30-day free pilot. Then €149 / €249 / €499 per seat.",
-    image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=85",
+    image: audAdvisory.url,
   },
   {
     to: "/corporations" as const,
     kicker: "For Corporations",
     title: "WHT · Pillar Two",
     body: "Group-level withholding, treaty routing, and OECD compliance across 131 jurisdictions.",
-    image:
-      "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?auto=format&fit=crop&w=1200&q=85",
+    image: audCorporations.url,
   },
   {
     to: "/individuals" as const,
     kicker: "For Individuals",
     title: "Residency & estate",
     body: "§6 AStG exit, §2 AStG extended limited, ErbStG cross-border. Math you can audit.",
-    image:
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=85",
-
+    image: audIndividuals.url,
   },
 ];
 
@@ -118,7 +111,7 @@ function Home() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="mb-6 font-mono text-[11px] font-medium uppercase tracking-editorial text-teal"
             >
-              Computational Tax Intelligence · v0.1
+              Computational Tax Intelligence
             </motion.p>
             <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
               Navigate borders.
