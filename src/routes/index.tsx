@@ -388,8 +388,9 @@ function Home() {
               className="image-reveal relative order-1 aspect-[4/3] overflow-hidden md:order-2"
             >
               <img
-                src={munichOlympia.url}
-                alt="Munich skyline"
+                src={munichCityscape.url}
+                alt="Munich rooftops and Frauenkirche"
+
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
