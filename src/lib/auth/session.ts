@@ -81,8 +81,9 @@ function getSnapshot(): State {
   return state;
 }
 
+const SERVER_SNAPSHOT: State = { session: null, loading: true };
 function getServerSnapshot(): State {
-  return { session: null, loading: true };
+  return SERVER_SNAPSHOT;
 }
 
 export function useSession() {
