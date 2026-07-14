@@ -16,11 +16,14 @@ import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as IndividualsRouteImport } from './routes/individuals'
+import { Route as DocsRouteImport } from './routes/docs'
 import { Route as CorporationsRouteImport } from './routes/corporations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
@@ -64,6 +67,11 @@ const IndividualsRoute = IndividualsRouteImport.update({
   path: '/individuals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CorporationsRoute = CorporationsRouteImport.update({
   id: '/corporations',
   path: '/corporations',
@@ -87,6 +95,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsSlugRoute = DocsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => DocsRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
@@ -131,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/docs': typeof DocsRouteWithChildren
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
@@ -143,6 +162,8 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
+  '/docs/': typeof DocsIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -163,6 +184,8 @@ export interface FileRoutesByTo {
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
+  '/docs': typeof DocsIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -173,6 +196,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/docs': typeof DocsRouteWithChildren
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
@@ -185,6 +209,8 @@ export interface FileRoutesById {
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/docs/$slug': typeof DocsSlugRoute
+  '/docs/': typeof DocsIndexRoute
   '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/_authenticated/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -195,6 +221,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/docs'
     | '/individuals'
     | '/investors'
     | '/login'
@@ -207,6 +234,8 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
+    | '/docs/'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
   fileRoutesByTo: FileRoutesByTo
@@ -227,6 +256,8 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
+    | '/docs'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
   id:
@@ -236,6 +267,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/docs'
     | '/individuals'
     | '/investors'
     | '/login'
@@ -248,6 +280,8 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace'
     | '/api/assistant'
     | '/auth/callback'
+    | '/docs/$slug'
+    | '/docs/'
     | '/_authenticated/workspace/results/$runId'
     | '/_authenticated/workspace/scenario/$scenarioId'
   fileRoutesById: FileRoutesById
@@ -258,6 +292,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   CorporationsRoute: typeof CorporationsRoute
+  DocsRoute: typeof DocsRouteWithChildren
   IndividualsRoute: typeof IndividualsRoute
   InvestorsRoute: typeof InvestorsRoute
   LoginRoute: typeof LoginRoute
@@ -320,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndividualsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/corporations': {
       id: '/corporations'
       path: '/corporations'
@@ -354,6 +396,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/$slug': {
+      id: '/docs/$slug'
+      path: '/$slug'
+      fullPath: '/docs/$slug'
+      preLoaderRoute: typeof DocsSlugRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -440,12 +496,25 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DocsRouteChildren {
+  DocsSlugRoute: typeof DocsSlugRoute
+  DocsIndexRoute: typeof DocsIndexRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsSlugRoute: DocsSlugRoute,
+  DocsIndexRoute: DocsIndexRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   CorporationsRoute: CorporationsRoute,
+  DocsRoute: DocsRouteWithChildren,
   IndividualsRoute: IndividualsRoute,
   InvestorsRoute: InvestorsRoute,
   LoginRoute: LoginRoute,

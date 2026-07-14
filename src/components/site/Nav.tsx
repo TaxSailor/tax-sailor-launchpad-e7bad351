@@ -18,6 +18,7 @@ const links = [
   { to: "/corporations", label: "Corporations" },
   { to: "/individuals", label: "Individuals" },
   { to: "/pricing", label: "Pricing" },
+  { to: "/docs", label: "Docs" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;
