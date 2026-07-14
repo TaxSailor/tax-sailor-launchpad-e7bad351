@@ -81,6 +81,11 @@ export function Nav() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/account" })}>
                   <UserCircle className="mr-2 size-4" /> Account
                 </DropdownMenuItem>
+                {user?.role === "admin" && (
+                  <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
+                    <ShieldCheck className="mr-2 size-4" /> Admin
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={async () => {
                     await logout();
