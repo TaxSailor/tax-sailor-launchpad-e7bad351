@@ -176,17 +176,18 @@ function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.8, ease: easeOut }}
-              className="image-reveal relative aspect-[4/5] overflow-hidden"
+              className="relative"
             >
-              <img
-                src={munichFacade.url}
-                alt="Glass facade in Munich financial district"
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 font-mono text-xs uppercase tracking-editorial text-white/80">
-                <span className="text-teal">●</span> W = −ln(1 − τ)
+              <div className="image-reveal relative overflow-hidden border border-navy/10 bg-ghost">
+                <RouteGraph className="block h-auto w-full" />
+              </div>
+              <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-editorial text-navy/60">
+                <span>
+                  <span className="text-teal">●</span> Optimal path · US → DE → CH → SG
+                </span>
+                <span className="text-navy">
+                  Cost function: W = −ln(1 − τ)
+                </span>
               </div>
             </motion.div>
 
