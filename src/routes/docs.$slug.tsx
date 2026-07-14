@@ -87,15 +87,21 @@ function ArticlePage() {
           <h1 className="mt-3 font-serif text-4xl text-navy md:text-5xl">{article.title}</h1>
           <p className="mt-4 font-serif text-lg text-navy/70">{article.summary}</p>
 
-          <div className="prose prose-slate mt-10 max-w-none font-sans text-navy/85
-            prose-headings:font-serif prose-headings:text-navy
-            prose-h2:mt-10 prose-h2:text-2xl
-            prose-h3:mt-8 prose-h3:text-xl
-            prose-a:text-teal prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-navy
-            prose-code:rounded prose-code:bg-canvas prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:text-navy
-            prose-li:marker:text-teal">
-            <ReactMarkdown>{article.body}</ReactMarkdown>
+          <div className="doc-body mt-10 font-sans text-[15px] leading-relaxed text-navy/85">
+            <ReactMarkdown
+              components={{
+                h2: ({ node, ...p }) => <h2 className="mt-10 mb-4 font-serif text-2xl text-navy" {...p} />,
+                h3: ({ node, ...p }) => <h3 className="mt-8 mb-3 font-serif text-xl text-navy" {...p} />,
+                p: ({ node, ...p }) => <p className="my-4" {...p} />,
+                a: ({ node, ...p }) => <a className="text-teal underline-offset-2 hover:underline" {...p} />,
+                strong: ({ node, ...p }) => <strong className="font-semibold text-navy" {...p} />,
+                ul: ({ node, ...p }) => <ul className="my-4 grid gap-2 pl-5 list-disc marker:text-teal" {...p} />,
+                ol: ({ node, ...p }) => <ol className="my-4 grid gap-2 pl-5 list-decimal marker:text-teal" {...p} />,
+                li: ({ node, ...p }) => <li className="pl-1" {...p} />,
+                code: ({ node, ...p }) => <code className="rounded bg-canvas px-1.5 py-0.5 font-mono text-[13px] text-navy" {...p} />,
+                hr: () => <hr className="my-8 border-navy/10" />,
+              }}
+            >{article.body}</ReactMarkdown>
           </div>
 
           <div className="mt-16 grid gap-4 border-t border-navy/10 pt-8 sm:grid-cols-2">
