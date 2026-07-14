@@ -22,6 +22,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
+import { Route as AuthenticatedWorkspaceScenarioScenarioIdRouteImport } from './routes/_authenticated/workspace.scenario.$scenarioId'
+import { Route as AuthenticatedWorkspaceResultsRunIdRouteImport } from './routes/_authenticated/workspace.results.$runId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -87,6 +89,18 @@ const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
   path: '/workspace',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWorkspaceScenarioScenarioIdRoute =
+  AuthenticatedWorkspaceScenarioScenarioIdRouteImport.update({
+    id: '/scenario/$scenarioId',
+    path: '/scenario/$scenarioId',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceResultsRunIdRoute =
+  AuthenticatedWorkspaceResultsRunIdRouteImport.update({
+    id: '/results/$runId',
+    path: '/results/$runId',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -99,8 +113,10 @@ export interface FileRoutesByFullPath {
   '/pilot': typeof PilotRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/workspace': typeof AuthenticatedWorkspaceRoute
+  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
+  '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,8 +129,10 @@ export interface FileRoutesByTo {
   '/pilot': typeof PilotRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/workspace': typeof AuthenticatedWorkspaceRoute
+  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
+  '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,8 +147,10 @@ export interface FileRoutesById {
   '/pilot': typeof PilotRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRoute
+  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
+  '/_authenticated/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +167,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/workspace'
     | '/auth/callback'
+    | '/workspace/results/$runId'
+    | '/workspace/scenario/$scenarioId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,6 +183,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/workspace'
     | '/auth/callback'
+    | '/workspace/results/$runId'
+    | '/workspace/scenario/$scenarioId'
   id:
     | '__root__'
     | '/'
@@ -176,6 +200,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/workspace'
     | '/auth/callback'
+    | '/_authenticated/workspace/results/$runId'
+    | '/_authenticated/workspace/scenario/$scenarioId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -286,15 +312,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/workspace/scenario/$scenarioId': {
+      id: '/_authenticated/workspace/scenario/$scenarioId'
+      path: '/scenario/$scenarioId'
+      fullPath: '/workspace/scenario/$scenarioId'
+      preLoaderRoute: typeof AuthenticatedWorkspaceScenarioScenarioIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/results/$runId': {
+      id: '/_authenticated/workspace/results/$runId'
+      path: '/results/$runId'
+      fullPath: '/workspace/results/$runId'
+      preLoaderRoute: typeof AuthenticatedWorkspaceResultsRunIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
   }
 }
 
+interface AuthenticatedWorkspaceRouteChildren {
+  AuthenticatedWorkspaceResultsRunIdRoute: typeof AuthenticatedWorkspaceResultsRunIdRoute
+  AuthenticatedWorkspaceScenarioScenarioIdRoute: typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
+}
+
+const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
+  {
+    AuthenticatedWorkspaceResultsRunIdRoute:
+      AuthenticatedWorkspaceResultsRunIdRoute,
+    AuthenticatedWorkspaceScenarioScenarioIdRoute:
+      AuthenticatedWorkspaceScenarioScenarioIdRoute,
+  }
+
+const AuthenticatedWorkspaceRouteWithChildren =
+  AuthenticatedWorkspaceRoute._addFileChildren(
+    AuthenticatedWorkspaceRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRoute
+  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRoute,
+  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

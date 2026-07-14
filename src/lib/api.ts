@@ -41,6 +41,14 @@ async function apiFetch<T>(
     headers.set("Content-Type", "application/json");
   }
   headers.set("Accept", "application/json");
+  // Attach bearer token if present (dynamic import to avoid client/api cycle).
+  try {
+    const { getAuthToken } = await import("@/lib/auth/session");
+    const t = getAuthToken();
+    if (t && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${t}`);
+  } catch {
+    /* noop */
+  }
 
   const res = await fetch(url, {
     ...init,
