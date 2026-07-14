@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { SCENARIOS } from "@/lib/workspace/scenarios";
 import { useSession } from "@/lib/auth/session";
 
 export const Route = createFileRoute("/_authenticated/workspace")({
@@ -14,31 +15,47 @@ export const Route = createFileRoute("/_authenticated/workspace")({
 function WorkspacePage() {
   const { user } = useSession();
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-teal">Workspace · v0</p>
-      <h1 className="mt-2 font-serif text-4xl text-navy">
-        Welcome{user?.name ? `, ${user.name}` : ""}.
-      </h1>
-      <p className="mt-3 max-w-xl text-navy/70">
-        Your optimizer, scenarios, and saved runs will appear here. We're porting them in from the
-        launchpad backend in the next phase.
-      </p>
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
-        {[
-          { t: "Optimizer", d: "Compute optimal cross-border routes across 131 jurisdictions." },
-          { t: "Scenarios", d: "Save, replay, and share tax scenarios with proofs." },
-          { t: "Assistant", d: "Ask about your run — every claim linked to the math." },
-        ].map((c) => (
-          <div
-            key={c.t}
-            className="rounded-sm border border-navy/10 bg-white p-6 shadow-[0_1px_2px_rgba(5,35,71,0.04)]"
+    <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-widest text-teal">
+            Workspace · Scenario picker
+          </p>
+          <h1 className="mt-2 font-serif text-3xl text-navy md:text-4xl">
+            What are you optimising{user?.name ? `, ${user.name.split(" ")[0]}` : ""}?
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-navy/70">
+            Pick a scenario. We route it across 131 jurisdictions and return an evidenced,
+            comparable optimum.
+          </p>
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-widest text-navy/50">
+          6 scenarios · v1
+        </div>
+      </div>
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {SCENARIOS.map((s) => (
+          <Link
+            key={s.id}
+            to="/workspace/scenario/$scenarioId"
+            params={{ scenarioId: s.id }}
+            className="group block rounded-sm border border-navy/10 bg-white p-6 transition hover:border-teal hover:shadow-[0_4px_20px_rgba(5,35,71,0.08)]"
           >
-            <p className="font-serif text-xl text-navy">{c.t}</p>
-            <p className="mt-2 text-sm text-navy/60">{c.d}</p>
-            <p className="mt-4 text-[10px] font-mono uppercase tracking-widest text-navy/40">
-              Coming soon
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-teal">
+                {s.audience}
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-navy/40 group-hover:text-navy">
+                Configure →
+              </span>
+            </div>
+            <p className="mt-3 font-serif text-xl text-navy">{s.title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-navy/60">{s.summary}</p>
+            <p className="mt-4 border-t border-navy/5 pt-3 font-mono text-[11px] text-navy/50">
+              {s.math}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
