@@ -6,10 +6,11 @@ import { LeadDialog } from "@/components/site/LeadForm";
 import { StatBar } from "@/components/site/StatBar";
 import heroImage from "@/assets/frankfurt-skyline.jpg.asset.json";
 import munichFacade from "@/assets/munich-city.jpg.asset.json";
-import audInvestors from "@/assets/audience-investors.jpg.asset.json";
+import audInvestors from "@/assets/audience-investors-new.jpg.asset.json";
 import audAdvisory from "@/assets/audience-advisory.jpg.asset.json";
-import audCorporations from "@/assets/audience-corporations.jpg.asset.json";
-import audIndividuals from "@/assets/audience-individuals.jpg.asset.json";
+import audCorporations from "@/assets/audience-corporations-new.jpg.asset.json";
+import audIndividuals from "@/assets/audience-individuals-new.jpg.asset.json";
+import { RouteGraph } from "@/components/site/RouteGraph";
 const munichCityscape = munichFacade;
 
 
@@ -96,14 +97,14 @@ function Home() {
         </motion.div>
 
         <motion.div
-          className="container-full relative flex h-full flex-col justify-end pb-16 pt-24 md:pb-24"
+          className="container-full relative flex h-full flex-col justify-center py-24 md:py-28"
           style={{ opacity: heroOpacity }}
         >
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: easeOut }}
-            className="max-w-3xl"
+            className="max-w-3xl lg:max-w-4xl"
           >
             <motion.p
               initial={{ opacity: 0 }}
@@ -113,7 +114,7 @@ function Home() {
             >
               Computational Tax Intelligence
             </motion.p>
-            <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-7xl lg:text-8xl">
+            <h1 className="mb-8 font-serif text-5xl leading-[0.95] tracking-tight text-white md:text-6xl lg:text-7xl xl:text-8xl">
               Navigate borders.
               <br />
               <span className="italic font-normal text-teal">Keep more.</span>
@@ -175,17 +176,18 @@ function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.8, ease: easeOut }}
-              className="image-reveal relative aspect-[4/5] overflow-hidden"
+              className="relative"
             >
-              <img
-                src={munichFacade.url}
-                alt="Glass facade in Munich financial district"
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 font-mono text-xs uppercase tracking-editorial text-white/80">
-                <span className="text-teal">●</span> W = −ln(1 − τ)
+              <div className="image-reveal relative overflow-hidden border border-navy/10 bg-ghost">
+                <RouteGraph className="block h-auto w-full" />
+              </div>
+              <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-editorial text-navy/60">
+                <span>
+                  <span className="text-teal">●</span> Optimal path · US → DE → CH → SG
+                </span>
+                <span className="text-navy">
+                  Cost function: W = −ln(1 − τ)
+                </span>
               </div>
             </motion.div>
 
