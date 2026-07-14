@@ -78,6 +78,9 @@ export function Nav() {
                 <DropdownMenuItem onClick={() => navigate({ to: "/workspace" })}>
                   <LayoutDashboard className="mr-2 size-4" /> Workspace
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate({ to: "/account" })}>
+                  <UserCircle className="mr-2 size-4" /> Account
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={async () => {
                     await logout();
