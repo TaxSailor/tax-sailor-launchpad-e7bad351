@@ -28,7 +28,14 @@ function SignupPage() {
     setError(null);
     setBusy(true);
     try {
-      await register(email, password, name || undefined);
+      await register(email, password);
+      if (name.trim()) {
+        try {
+          await updateProfile({ display_name: name.trim() });
+        } catch {
+          /* non-fatal — user can edit display name from /account */
+        }
+      }
       navigate({ to: "/workspace" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-up failed");
