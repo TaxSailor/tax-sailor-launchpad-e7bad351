@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell, OAuthButtons, AuthDivider } from "@/components/auth/AuthShell";
 import { register, signInWithOAuth } from "@/lib/auth/session";
+import { updateProfile } from "@/lib/workspace/account";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -27,7 +28,14 @@ function SignupPage() {
     setError(null);
     setBusy(true);
     try {
-      await register(email, password, name || undefined);
+      await register(email, password);
+      if (name.trim()) {
+        try {
+          await updateProfile({ display_name: name.trim() });
+        } catch {
+          /* non-fatal — user can edit display name from /account */
+        }
+      }
       navigate({ to: "/workspace" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-up failed");
