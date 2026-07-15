@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SCENARIOS } from "@/lib/workspace/scenarios";
 import { useSession } from "@/lib/auth/session";
 
-export const Route = createFileRoute("/_authenticated/workspace")({
+export const Route = createFileRoute("/_authenticated/workspace/")({
   head: () => ({
     meta: [
       { title: "Workspace — TaxSailor" },
