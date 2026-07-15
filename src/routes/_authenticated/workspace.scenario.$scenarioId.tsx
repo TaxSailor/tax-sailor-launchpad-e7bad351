@@ -1,6 +1,12 @@
 import { createFileRoute, useNavigate, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { getScenario, runSimulation, type ScenarioId } from "@/lib/workspace/scenarios";
+import { useEffect, useState } from "react";
+import {
+  getScenario,
+  runSimulation,
+  loadJurisdictions,
+  FALLBACK_JURISDICTIONS,
+  flagEmoji,
+} from "@/lib/workspace/scenarios";
 
 export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenarioId")({
   head: ({ params }) => ({
@@ -33,31 +39,39 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
   component: ScenarioPage,
 });
 
-const JURISDICTIONS = ["US", "DE", "CH", "SG", "LU", "IE", "AE"] as const;
-
 function ScenarioPage() {
   const { scenario } = Route.useLoaderData();
   const navigate = useNavigate();
-  const [origin, setOrigin] = useState<string>("US");
-  const [destination, setDestination] = useState<string>("SG");
+  const [origin, setOrigin] = useState<string>("DE");
+  const [destination, setDestination] = useState<string>("CH");
   const [amount, setAmount] = useState<number>(1_000_000);
   const [familyStatus, setFamilyStatus] = useState<"single" | "married" | "family">("single");
+  const [residencyYears, setResidencyYears] = useState<number>(5);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [jurisdictions, setJurisdictions] = useState<string[]>([...FALLBACK_JURISDICTIONS]);
+
+  useEffect(() => {
+    loadJurisdictions().then(setJurisdictions).catch(() => undefined);
+  }, []);
+
+  const isIndividual = scenario.perspective === "individual";
+  const isInheritance =
+    scenario.mode === "inheritance_property" || scenario.mode === "inheritance_stocks";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      const res = await runSimulation({
-        scenarioId: scenario.id as ScenarioId,
+      const run = await runSimulation(scenario, {
         origin,
         destination,
         amount,
-        familyStatus,
+        familyStatus: isInheritance || isIndividual ? familyStatus : undefined,
+        residencyYears: isIndividual ? residencyYears : undefined,
       });
-      navigate({ to: "/workspace/results/$runId", params: { runId: res.runId } });
+      navigate({ to: "/workspace/results/$runId", params: { runId: run.runId } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run simulation");
       setSubmitting(false);
@@ -78,10 +92,10 @@ function ScenarioPage() {
       <form onSubmit={submit} className="mt-10 grid gap-6 rounded-sm border border-navy/10 bg-white p-6 md:p-8">
         <div className="grid gap-6 md:grid-cols-2">
           <Field label={scenario.originLabel}>
-            <Select value={origin} onChange={setOrigin} />
+            <Select value={origin} onChange={setOrigin} options={jurisdictions} />
           </Field>
           <Field label={scenario.destinationLabel}>
-            <Select value={destination} onChange={setDestination} />
+            <Select value={destination} onChange={setDestination} options={jurisdictions} />
           </Field>
         </div>
 
@@ -96,25 +110,37 @@ function ScenarioPage() {
           />
         </Field>
 
-        {(scenario.id === "wealth_transfer" || scenario.id === "inheritance") && (
-          <Field label="Family status">
-            <div className="flex gap-2">
-              {(["single", "married", "family"] as const).map((v) => (
-                <button
-                  type="button"
-                  key={v}
-                  onClick={() => setFamilyStatus(v)}
-                  className={`rounded-sm border px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest ${
-                    familyStatus === v
-                      ? "border-teal bg-teal text-white"
-                      : "border-navy/15 text-navy/70 hover:border-navy/40"
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </Field>
+        {isIndividual && (
+          <div className="grid gap-6 md:grid-cols-2">
+            <Field label="Family status">
+              <div className="flex flex-wrap gap-2">
+                {(["single", "married", "family"] as const).map((v) => (
+                  <button
+                    type="button"
+                    key={v}
+                    onClick={() => setFamilyStatus(v)}
+                    className={`rounded-sm border px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest ${
+                      familyStatus === v
+                        ? "border-teal bg-teal text-white"
+                        : "border-navy/15 text-navy/70 hover:border-navy/40"
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="Residency years (current jurisdiction)">
+              <input
+                type="number"
+                min={0}
+                max={99}
+                value={residencyYears}
+                onChange={(e) => setResidencyYears(Number(e.target.value))}
+                className="w-full rounded-sm border border-navy/15 bg-white px-3 py-2.5 font-mono text-sm text-navy focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+              />
+            </Field>
+          </div>
         )}
 
         <div className="mt-2 flex items-center justify-between border-t border-navy/5 pt-4">
@@ -144,16 +170,24 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Select({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function Select({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-sm border border-navy/15 bg-white px-3 py-2.5 font-mono text-sm text-navy focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
     >
-      {JURISDICTIONS.map((j) => (
+      {options.map((j) => (
         <option key={j} value={j}>
-          {j}
+          {flagEmoji(j)} {j}
         </option>
       ))}
     </select>

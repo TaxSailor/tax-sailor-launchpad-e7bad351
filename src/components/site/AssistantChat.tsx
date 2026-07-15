@@ -1,9 +1,13 @@
 // Floating assistant chat — mounted inside the authenticated workspace layout.
-// Sends full conversation history to /api/assistant on each turn.
+// Real mode: POST to the FastAPI backend at /ui/chat.
+// Mock mode (no VITE_API_BASE_URL): POST to the local /api/assistant edge
+// route that proxies Lovable AI Gateway. Both take the full history each turn.
 
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { API_BASE_URL, IS_MOCK_API, ApiError } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth/session";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -14,6 +18,47 @@ const SEED: Msg[] = [
       "Hi — I'm the **TaxSailor Assistant**. Ask me anything about the workspace, our pricing tiers, or general cross-border tax concepts. I'm not a licensed advisor, so for anything binding, book a call via /contact.",
   },
 ];
+
+async function callBackend(messages: Msg[]): Promise<string> {
+  const url = `${API_BASE_URL}/ui/chat`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  const token = getAuthToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ messages }),
+  });
+  const text = await res.text();
+  let body: unknown = null;
+  try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    if (body && typeof body === "object" && "detail" in body) {
+      const d = (body as { detail: unknown }).detail;
+      if (typeof d === "string") msg = d;
+    }
+    throw new ApiError(msg, res.status, body);
+  }
+  const reply = (body && typeof body === "object" && "reply" in body)
+    ? String((body as { reply: unknown }).reply ?? "")
+    : "";
+  return reply;
+}
+
+async function callMockGateway(messages: Msg[]): Promise<string> {
+  const res = await fetch("/api/assistant", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages }),
+  });
+  const data = (await res.json()) as { reply?: string; error?: string };
+  if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
+  return data.reply ?? "";
+}
 
 export function AssistantChat() {
   const [open, setOpen] = useState(false);
@@ -36,14 +81,11 @@ export function AssistantChat() {
     setInput("");
     setSending(true);
     try {
-      const res = await fetch("/api/assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
-      });
-      const data = (await res.json()) as { reply?: string; error?: string };
-      if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
-      setMessages((m) => [...m, { role: "assistant", content: data.reply ?? "" }]);
+      const history = next
+        .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim().length > 0)
+        .slice(-20);
+      const reply = IS_MOCK_API ? await callMockGateway(history) : await callBackend(history);
+      setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -79,10 +121,7 @@ export function AssistantChat() {
           </div>
           <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto bg-ghost/40 px-4 py-4">
             {messages.map((m, i) => (
-              <div
-                key={i}
-                className={m.role === "user" ? "flex justify-end" : ""}
-              >
+              <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
                 <div
                   className={
                     m.role === "user"
@@ -90,11 +129,7 @@ export function AssistantChat() {
                       : "max-w-[95%] text-sm text-navy [&_a]:text-teal [&_a]:underline [&_code]:rounded [&_code]:bg-navy/5 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_strong]:text-navy [&_strong]:font-semibold"
                   }
                 >
-                  {m.role === "assistant" ? (
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                  ) : (
-                    m.content
-                  )}
+                  {m.role === "assistant" ? <ReactMarkdown>{m.content}</ReactMarkdown> : m.content}
                 </div>
               </div>
             ))}
@@ -122,7 +157,7 @@ export function AssistantChat() {
                 }}
                 placeholder="Ask about your workspace…"
                 rows={1}
-                className="min-h-[40px] max-h-32 flex-1 resize-none rounded-sm border border-navy/15 bg-white px-3 py-2 text-sm text-navy outline-none focus:border-teal"
+                className="min-h=[40px] max-h-32 flex-1 resize-none rounded-sm border border-navy/15 bg-white px-3 py-2 text-sm text-navy outline-none focus:border-teal"
               />
               <button
                 onClick={send}

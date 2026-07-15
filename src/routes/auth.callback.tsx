@@ -13,13 +13,26 @@ function CallbackPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const magic = params.get("magic_token");
+    // Backend redirects with either query params or a URL fragment.
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    // Also fold in fragment params (`#access_token=…`) which some OAuth
+    // flows use to keep tokens out of server logs.
+    if (url.hash.startsWith("#")) {
+      const fragment = new URLSearchParams(url.hash.slice(1));
+      fragment.forEach((value, key) => {
+        if (!params.has(key)) params.set(key, value);
+      });
+    }
+
+    const magic = params.get("magic_token") ?? params.get("token");
     const returnTo = params.get("return_to") ?? "/workspace";
+    const errorParam = params.get("error") ?? params.get("error_description");
 
     (async () => {
       try {
-        if (magic) {
+        if (errorParam) throw new Error(errorParam);
+        if (magic && !params.get("access_token")) {
           await redeemMagicLink(magic);
         } else {
           await completeOAuthCallback(params);

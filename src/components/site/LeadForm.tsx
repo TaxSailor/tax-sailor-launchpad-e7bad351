@@ -20,24 +20,40 @@ type LeadPayload = {
   company?: string;
   message?: string;
   source_path?: string;
+  website?: string; // honeypot
+};
+
+// Backend accepts tier_id ∈ {consumer, professional, premium, enterprise} or null.
+// We map audience → suggested tier where it makes sense; otherwise pass null and
+// prefix the message with the audience so sales can route it.
+const AUDIENCE_TIER: Record<Audience, string | null> = {
+  investors: null,
+  pilot: "professional",
+  corporations: "enterprise",
+  individuals: "consumer",
+  general: null,
 };
 
 async function submitLead(payload: LeadPayload) {
-  // FastAPI backend: POST /api/leads/pricing (see src/api/routers/leads.py).
-  // We pass audience as the tier_id so sales sees which surface it came from.
-  return api.post<{ id: string; created_at: string }>(
-    "/api/leads/pricing",
+  const audiencePrefix = `[${payload.audience.toUpperCase()}] `;
+  const rawMessage = payload.message?.trim() ?? "";
+  const message = rawMessage.length >= 10
+    ? `${audiencePrefix}${rawMessage}`
+    : `${audiencePrefix}${rawMessage || "Interested in TaxSailor — please reach out."} (from ${payload.source_path ?? "unknown"})`;
+
+  return api.post<{ id: number; created_at: string; message: string }>(
+    "/leads/pricing",
     {
       name: payload.name,
       email: payload.email,
       company: payload.company || undefined,
-      tier_id: payload.audience,
-      message: payload.message || `Lead from ${payload.source_path ?? "unknown"}`,
+      tier_id: AUDIENCE_TIER[payload.audience] ?? undefined,
+      message,
+      website: payload.website || undefined,
     },
-    { mock: () => ({ id: `mock-${Date.now()}`, created_at: new Date().toISOString() }) },
+    { skipAuth: true, mock: () => ({ id: Date.now(), created_at: new Date().toISOString(), message: "Received." }) },
   );
 }
-
 
 const audienceCopy: Record<Audience, { title: string; description: string; cta: string }> = {
   investors: {
@@ -104,6 +120,7 @@ export function LeadForm({ audience, onSuccess }: { audience: Audience; onSucces
           email: String(f.get("email") ?? ""),
           company: String(f.get("company") ?? ""),
           message: String(f.get("message") ?? ""),
+          website: String(f.get("website") ?? ""),
           source_path: typeof window !== "undefined" ? window.location.pathname : undefined,
         });
       }}
@@ -114,6 +131,7 @@ export function LeadForm({ audience, onSuccess }: { audience: Audience; onSucces
           <input
             name="name"
             required
+            minLength={2}
             maxLength={120}
             className="rounded-sm border border-navy/10 bg-white px-3 py-2.5 text-sm font-mono focus:border-teal focus:outline-none"
           />
@@ -133,19 +151,28 @@ export function LeadForm({ audience, onSuccess }: { audience: Audience; onSucces
         <span className="text-[11px] font-medium uppercase tracking-widest text-navy/60">Company / Firm</span>
         <input
           name="company"
-          maxLength={200}
+          maxLength={120}
           className="rounded-sm border border-navy/10 bg-white px-3 py-2.5 text-sm font-mono focus:border-teal focus:outline-none"
         />
       </label>
       <label className="grid gap-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-widest text-navy/60">Message (optional)</span>
+        <span className="text-[11px] font-medium uppercase tracking-widest text-navy/60">Message</span>
         <textarea
           name="message"
           rows={3}
-          maxLength={5000}
+          maxLength={4000}
+          placeholder="A sentence or two on what you're looking for…"
           className="rounded-sm border border-navy/10 bg-white px-3 py-2.5 text-sm focus:border-teal focus:outline-none"
         />
       </label>
+      {/* Honeypot: bots fill it, humans don't see it. */}
+      <input
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute left-[-9999px] h-0 w-0 opacity-0"
+      />
       {mutation.isError && (
         <p className="text-sm text-destructive">
           {mutation.error instanceof Error ? mutation.error.message : "Something went wrong."}

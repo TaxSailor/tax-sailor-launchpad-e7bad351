@@ -1,9 +1,12 @@
 // Typed fetch client for the TaxSailor FastAPI backend.
 //
 // Base URL comes from VITE_API_BASE_URL (e.g. "https://taxsailor-web.onrender.com").
-// When unset (Lovable preview / local dev without backend), the client runs in
-// MOCK mode: reads return canned fixtures, writes simulate 200 OK after a small
-// delay. This lets us design and QA the whole surface before cutover.
+// When unset, the client runs in MOCK mode using canned fixtures declared at
+// each call site.
+//
+// The FastAPI service does NOT mount its routers under an /api prefix, so
+// every path here uses the plain backend contract: /auth/*, /simulate,
+// /leads/pricing, /account/*, /ui/chat, /jurisdictions, /documents/*, etc.
 
 export const API_BASE_URL: string =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/+$/, "") ?? "";
@@ -28,11 +31,11 @@ async function delay(ms: number) {
 
 async function apiFetch<T>(
   path: string,
-  init: RequestInit & { mock?: () => T | Promise<T> } = {},
+  init: RequestInit & { mock?: () => T | Promise<T>; skipAuth?: boolean } = {},
 ): Promise<T> {
   if (IS_MOCK_API) {
     if (!init.mock) throw new ApiError(`No mock for ${path}`, 501, null);
-    await delay(300);
+    await delay(250);
     return init.mock();
   }
   const url = `${API_BASE_URL}${path}`;
@@ -41,20 +44,18 @@ async function apiFetch<T>(
     headers.set("Content-Type", "application/json");
   }
   headers.set("Accept", "application/json");
-  // Attach bearer token if present (dynamic import to avoid client/api cycle).
-  try {
-    const { getAuthToken } = await import("@/lib/auth/session");
-    const t = getAuthToken();
-    if (t && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${t}`);
-  } catch {
-    /* noop */
+
+  if (!init.skipAuth) {
+    try {
+      const { getAuthToken } = await import("@/lib/auth/session");
+      const t = getAuthToken();
+      if (t && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${t}`);
+    } catch {
+      /* noop */
+    }
   }
 
-  const res = await fetch(url, {
-    ...init,
-    headers,
-    credentials: "include",
-  });
+  const res = await fetch(url, { ...init, headers });
 
   let body: unknown = null;
   const text = await res.text();
@@ -66,30 +67,35 @@ async function apiFetch<T>(
     }
   }
   if (!res.ok) {
-    const msg =
-      (body && typeof body === "object" && "detail" in body
-        ? String((body as { detail: unknown }).detail)
-        : `Request failed: ${res.status}`) || `HTTP ${res.status}`;
+    let msg = `HTTP ${res.status}`;
+    if (body && typeof body === "object" && "detail" in body) {
+      const d = (body as { detail: unknown }).detail;
+      if (typeof d === "string") msg = d;
+      else if (Array.isArray(d) && d[0] && typeof d[0] === "object" && "msg" in (d[0] as object))
+        msg = String((d[0] as { msg: unknown }).msg);
+      else if (d && typeof d === "object" && "message" in (d as object))
+        msg = String((d as { message: unknown }).message);
+    }
     throw new ApiError(msg, res.status, body);
   }
   return body as T;
 }
 
 export const api = {
-  get: <T>(path: string, opts: { mock?: () => T | Promise<T> } = {}) =>
-    apiFetch<T>(path, { method: "GET", mock: opts.mock }),
-  post: <T>(path: string, data?: Json | FormData, opts: { mock?: () => T | Promise<T> } = {}) =>
+  get: <T>(path: string, opts: { mock?: () => T | Promise<T>; skipAuth?: boolean } = {}) =>
+    apiFetch<T>(path, { method: "GET", ...opts }),
+  post: <T>(path: string, data?: Json | FormData, opts: { mock?: () => T | Promise<T>; skipAuth?: boolean } = {}) =>
     apiFetch<T>(path, {
       method: "POST",
-      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined,
-      mock: opts.mock,
+      body: data instanceof FormData ? data : data !== undefined ? JSON.stringify(data) : undefined,
+      ...opts,
     }),
-  patch: <T>(path: string, data?: Json, opts: { mock?: () => T | Promise<T> } = {}) =>
+  patch: <T>(path: string, data?: Json, opts: { mock?: () => T | Promise<T>; skipAuth?: boolean } = {}) =>
     apiFetch<T>(path, {
       method: "PATCH",
-      body: data ? JSON.stringify(data) : undefined,
-      mock: opts.mock,
+      body: data !== undefined ? JSON.stringify(data) : undefined,
+      ...opts,
     }),
-  del: <T>(path: string, opts: { mock?: () => T | Promise<T> } = {}) =>
-    apiFetch<T>(path, { method: "DELETE", mock: opts.mock }),
+  del: <T>(path: string, opts: { mock?: () => T | Promise<T>; skipAuth?: boolean } = {}) =>
+    apiFetch<T>(path, { method: "DELETE", ...opts }),
 };
