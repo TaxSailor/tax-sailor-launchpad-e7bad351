@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell, OAuthButtons, AuthDivider } from "@/components/auth/AuthShell";
 import { register, signInWithOAuth } from "@/lib/auth/session";
+import { updateProfile } from "@/lib/workspace/account";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
