@@ -26,9 +26,9 @@ import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
-import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated/workspace'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated/workspace.index'
 import { Route as AuthenticatedWorkspaceScenarioScenarioIdRouteImport } from './routes/_authenticated/workspace.scenario.$scenarioId'
 import { Route as AuthenticatedWorkspaceResultsRunIdRouteImport } from './routes/_authenticated/workspace.results.$runId'
 
@@ -116,11 +116,6 @@ const ApiAssistantRoute = ApiAssistantRouteImport.update({
   path: '/api/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
-  id: '/workspace',
-  path: '/workspace',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -131,17 +126,23 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWorkspaceIndexRoute =
+  AuthenticatedWorkspaceIndexRouteImport.update({
+    id: '/workspace/',
+    path: '/workspace/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedWorkspaceScenarioScenarioIdRoute =
   AuthenticatedWorkspaceScenarioScenarioIdRouteImport.update({
-    id: '/scenario/$scenarioId',
-    path: '/scenario/$scenarioId',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
+    id: '/workspace/scenario/$scenarioId',
+    path: '/workspace/scenario/$scenarioId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedWorkspaceResultsRunIdRoute =
   AuthenticatedWorkspaceResultsRunIdRouteImport.update({
-    id: '/results/$runId',
-    path: '/results/$runId',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
+    id: '/workspace/results/$runId',
+    path: '/workspace/results/$runId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -159,11 +160,11 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
+  '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -181,11 +182,11 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs': typeof DocsIndexRoute
+  '/workspace': typeof AuthenticatedWorkspaceIndexRoute
   '/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -206,11 +207,11 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
+  '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
   '/_authenticated/workspace/results/$runId': typeof AuthenticatedWorkspaceResultsRunIdRoute
   '/_authenticated/workspace/scenario/$scenarioId': typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
@@ -231,11 +232,11 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/account'
     | '/admin'
-    | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs/'
+    | '/workspace/'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
   fileRoutesByTo: FileRoutesByTo
@@ -253,11 +254,11 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/account'
     | '/admin'
-    | '/workspace'
     | '/api/assistant'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs'
+    | '/workspace'
     | '/workspace/results/$runId'
     | '/workspace/scenario/$scenarioId'
   id:
@@ -277,11 +278,11 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/account'
     | '/_authenticated/admin'
-    | '/_authenticated/workspace'
     | '/api/assistant'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs/'
+    | '/_authenticated/workspace/'
     | '/_authenticated/workspace/results/$runId'
     | '/_authenticated/workspace/scenario/$scenarioId'
   fileRoutesById: FileRoutesById
@@ -425,13 +426,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/workspace': {
-      id: '/_authenticated/workspace'
-      path: '/workspace'
-      fullPath: '/workspace'
-      preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -446,51 +440,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/workspace/': {
+      id: '/_authenticated/workspace/'
+      path: '/workspace'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/workspace/scenario/$scenarioId': {
       id: '/_authenticated/workspace/scenario/$scenarioId'
-      path: '/scenario/$scenarioId'
+      path: '/workspace/scenario/$scenarioId'
       fullPath: '/workspace/scenario/$scenarioId'
       preLoaderRoute: typeof AuthenticatedWorkspaceScenarioScenarioIdRouteImport
-      parentRoute: typeof AuthenticatedWorkspaceRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/workspace/results/$runId': {
       id: '/_authenticated/workspace/results/$runId'
-      path: '/results/$runId'
+      path: '/workspace/results/$runId'
       fullPath: '/workspace/results/$runId'
       preLoaderRoute: typeof AuthenticatedWorkspaceResultsRunIdRouteImport
-      parentRoute: typeof AuthenticatedWorkspaceRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
-
-interface AuthenticatedWorkspaceRouteChildren {
-  AuthenticatedWorkspaceResultsRunIdRoute: typeof AuthenticatedWorkspaceResultsRunIdRoute
-  AuthenticatedWorkspaceScenarioScenarioIdRoute: typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
-}
-
-const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
-  {
-    AuthenticatedWorkspaceResultsRunIdRoute:
-      AuthenticatedWorkspaceResultsRunIdRoute,
-    AuthenticatedWorkspaceScenarioScenarioIdRoute:
-      AuthenticatedWorkspaceScenarioScenarioIdRoute,
-  }
-
-const AuthenticatedWorkspaceRouteWithChildren =
-  AuthenticatedWorkspaceRoute._addFileChildren(
-    AuthenticatedWorkspaceRouteChildren,
-  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
+  AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
+  AuthenticatedWorkspaceResultsRunIdRoute: typeof AuthenticatedWorkspaceResultsRunIdRoute
+  AuthenticatedWorkspaceScenarioScenarioIdRoute: typeof AuthenticatedWorkspaceScenarioScenarioIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
+  AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
+  AuthenticatedWorkspaceResultsRunIdRoute:
+    AuthenticatedWorkspaceResultsRunIdRoute,
+  AuthenticatedWorkspaceScenarioScenarioIdRoute:
+    AuthenticatedWorkspaceScenarioScenarioIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
