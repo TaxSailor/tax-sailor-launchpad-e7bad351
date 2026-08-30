@@ -19,7 +19,7 @@ function DocsLayout() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-teal">Documentation</p>
-            <h1 className="mt-2 font-serif text-3xl text-navy md:text-4xl">Knowledge center</h1>
+            <p className="mt-2 font-serif text-3xl text-navy md:text-4xl">Knowledge center</p>
           </div>
           <Link
             to="/docs"

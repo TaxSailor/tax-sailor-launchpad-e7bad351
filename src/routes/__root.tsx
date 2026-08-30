@@ -76,7 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TaxSailor — Computational Tax Intelligence for Cross-Border Capital" },
+      { title: "TaxSailor" },
       {
         name: "description",
         content:
@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "TaxSailor" },
       { property: "og:site_name", content: "TaxSailor" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "TaxSailor — Computational Tax Intelligence" },
+      { property: "og:title", content: "TaxSailor" },
       {
         property: "og:description",
         content:
