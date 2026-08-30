@@ -213,3 +213,18 @@ Carry into Batch 4 (account/auth depth):
 - New routes: /forgot-password, /reset-password. Login now links to password recovery.
 - Typecheck green; /account returns 200.
 Next: Batch 5 — /demo QR proof surface, assistant handoff, analytics events.
+
+## Batch 5 — Demo surface and assistant — DONE (2026-08-30)
+- src/lib/demo.ts: redeemQrToken() over GET /event/qr/{token} (skipAuth, commits the
+  demo bearer via applyToken) plus the DEMO_CORRIDOR constant (Germany to UAE, EUR 1m).
+- src/routes/demo.tsx: public /demo proof surface. One-run corridor card (retained,
+  leakage, hops, flagged route chips, compliance notes, briefing and workspace CTAs),
+  event-code panel with auto-redeem from ?token= / ?t=, shareable QR link with copy,
+  and a next-steps block. Own head() metadata, 44px targets, real loading/error states.
+- AssistantChat rebuilt: starter prompts, ui_context + active_result sent with every
+  turn (scenario, corridor, codes, amount, last result), workspace_actions rendered as
+  deep links into /workspace/scenario/$scenarioId with from/to/amount, gating teaser
+  with /pricing link, results handoff navigation, 8s retry cooldown, context line.
+- /demo added to nav, footer and sitemap.
+Verification: tsgo clean; /demo returns 200.
+Next: Batch 6 — link audit, head metadata sweep, performance and responsive pass, publish prep.

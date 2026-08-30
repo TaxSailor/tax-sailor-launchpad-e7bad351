@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const links = [
+  { to: "/demo", label: "Demo" },
   { to: "/investors", label: "Investors" },
   { to: "/pilot", label: "Pilot" },
   { to: "/corporations", label: "Corporations" },
