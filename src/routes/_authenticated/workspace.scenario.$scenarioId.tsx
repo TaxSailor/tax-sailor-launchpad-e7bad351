@@ -40,7 +40,9 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
 });
 
 function ScenarioPage() {
-  const { scenario } = Route.useLoaderData();
+  const { scenarioId } = Route.useLoaderData();
+  const scenario = getScenario(scenarioId);
+  if (!scenario) return null;
   const navigate = useNavigate();
   const [origin, setOrigin] = useState<string>("DE");
   const [destination, setDestination] = useState<string>("CH");
