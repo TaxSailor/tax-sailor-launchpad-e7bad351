@@ -12,6 +12,7 @@ export function Footer() {
           </p>
         </div>
         <div className="flex flex-wrap gap-6 text-xs font-mono uppercase tracking-widest text-navy/40">
+          <Link to="/demo" className="hover:text-teal">Demo</Link>
           <Link to="/investors" className="hover:text-teal">Investors</Link>
           <Link to="/pilot" className="hover:text-teal">Pilot</Link>
           <Link to="/about" className="hover:text-teal">About</Link>
