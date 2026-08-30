@@ -179,3 +179,25 @@ Carry into Batch 3:
   /documents/route-citations.
 - Server-driven gating polish (entitlement tier badges, upgrade prompts).
 - Decide whether to delete `src/routes/api/assistant.ts` (now unused).
+
+## Batch 3 — Evidence surfaces and gating polish — DONE (2026-08-30)
+
+Shipped:
+- `src/lib/workspace/evidence.ts`: clients for GET /documents/summary,
+  POST /documents/route-sources, POST /documents/route-citations (path,
+  path_details, compliance_warnings passed through when present).
+- `src/components/workspace/EvidencePanel.tsx`: on-demand evidence panel on the
+  results page. Per-hop legal reference cards (corridor with flags, citation
+  type, legal reference, summary, exact or masked withholding rate, penalty
+  loading) plus grouped treaty, compliance and notice source lists, reference
+  counts, entitlement tier line, and a gated upgrade note linking to /pricing.
+- Results page mounts EvidencePanel with the run's path, path_details and
+  compliance warnings.
+- Removed the now unused local gateway route `src/routes/api/assistant.ts`
+  (assistant chat goes through the backend proxy to /ui/chat).
+
+Verification: `npx tsgo --noEmit` clean.
+
+Carry into Batch 4 (account/auth depth):
+- Profile edit, password change, avatar multipart upload through the proxy,
+  GDPR export/delete, saved-run management, OAuth provider linking.
