@@ -65,17 +65,17 @@ async function apiFetch<T>(
 }
 
 export const api = {
-  get: <T>(path: string, opts: { skipAuth?: boolean } = {}) =>
+  get: <T>(path: string, opts: CallOpts = {}) =>
     apiFetch<T>(path, { method: "GET", ...opts }),
-  post: <T>(path: string, data?: Json | FormData, opts: { skipAuth?: boolean } = {}) =>
+  post: <T>(path: string, data?: Json | FormData, opts: CallOpts = {}) =>
     apiFetch<T>(path, {
       method: "POST",
       body: data instanceof FormData ? data : data !== undefined ? JSON.stringify(data) : undefined,
       ...opts,
     }),
-  patch: <T>(path: string, data?: Json, opts: { skipAuth?: boolean } = {}) =>
+  patch: <T>(path: string, data?: Json, opts: CallOpts = {}) =>
     apiFetch<T>(path, { method: "PATCH", body: data !== undefined ? JSON.stringify(data) : undefined, ...opts }),
-  del: <T>(path: string, opts: { skipAuth?: boolean } = {}) =>
+  del: <T>(path: string, opts: CallOpts = {}) =>
     apiFetch<T>(path, { method: "DELETE", ...opts }),
 };
 
