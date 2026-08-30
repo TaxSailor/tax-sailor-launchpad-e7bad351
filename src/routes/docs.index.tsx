@@ -38,6 +38,10 @@ function DocsIndex() {
   return (
     <section className="px-6 py-14">
       <div className="mx-auto max-w-7xl">
+        <h1 className="mb-3 font-serif text-3xl text-navy md:text-4xl">TaxSailor documentation</h1>
+        <p className="mb-10 max-w-2xl font-sans text-sm text-navy/70">
+          Method, corpus, workspace, and trust posture. One article per topic.
+        </p>
         <div className="relative mb-12 max-w-xl">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-navy/40" />
           <input
