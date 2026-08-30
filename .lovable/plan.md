@@ -1,107 +1,71 @@
+# W2 — Complete the product surface in the new design
 
-# Redesign plan — full TaxSailor app on Scientific Ledger
+Goal for today's track: every page the old app had exists in the new TaxSailor design, wired to the live backend, so we can then go page by page and refine. The landing page is final and will not be touched.
 
-## What's in the private repo (source of truth)
+## What the repository scan found
 
-Backend (`src/api/` — FastAPI on Render service `taxsailor-web`, `/api/*` prefix):
-- Routers: `auth.py`, `oauth.py`, `account.py`, `leads.py`, `events.py`
-- Engine: `src/core/` (Dijkstra tax route optimizer, treaty data)
-- DB: `tax_database.db` (SQLite in repo; Postgres in prod)
+Backend (FastAPI, deployed on Render, no `/api` prefix):
 
-Frontend (`frontend/src/` — React SPA + react-router-dom):
-- Routes: `/`, `/demo`, `/workspace`, `/pricing`, `/account`, `/login`
-- Features: auth (magic link, email/pw, Google + Facebook OAuth), account (profile, avatar, GDPR export, run history, subscription), pricing/paywall, workspace (scenario picker → guided questionnaire → simulation), results (RouteFlowChart, ComparisonTable, evidence panel, PDF export), assistant chat, demo QR flow
+- Auth: `/auth/*` (login, register, magic link, password reset, session), OAuth at `/auth/oauth/*` (Google, Facebook, account linking).
+- Account: `/account/*` (profile, subscription, saved runs, avatar, GDPR export and deletion, settings).
+- Engine: `/simulate`, `/simulate/top-paths`, `/simulate/export/cbcr`, `/simulate/export/gir`, `/jurisdictions`, `/graph/summary`, `/ui/conditions`.
+- Evidence: `/documents/summary`, `/documents/route-sources`, `/documents/route-citations`.
+- Assistant: `/ui/chat`. Leads: `/leads/*`. Analytics: `/event/*`.
+- Entitlement and gating middleware shapes every response, so tier gating is server-driven, not a frontend guess.
 
-Docs (`docs/product/`, `docs/business/`, `docs/*.tex`):
-- Phase 31–33 sprint plans, E2E matrices, security review, WhitePaper.tex, Tech_Sprint_Documentation.tex
+Old frontend (React SPA, six top-level routes): `/`, `/demo`, `/workspace`, `/pricing`, `/account`, `/login`, plus QR and magic-link entry params. Behind those six routes sit the surfaces that actually matter and that our new site does not have yet:
 
-## Strategy — the split
+- Workspace entry fork (guide me with AI vs choose manually), scenario tiles, two-step scenario setup, search mode picker, flow stepper, decision tree, structure diagram.
+- Route briefing results: route flow chart, math proof table, result panels, technical details, best destinations, how to read results, coverage and disclaimer notices.
+- Evidence layer: legal evidence panel, citation cards, document snippet excerpts, source pending and empty states, copy evidence.
+- Gating layer: locked teasers, blur reveal, citation teasers, paywall unlock CTA, upgrade notices.
+- Assistant: chat panel with starter prompts, workspace and results handoff, deep links, retry cooldown, gating banner.
+- Account: profile, security, subscription, history with saved run editor, avatar upload, personalisation and theme, danger zone (GDPR export and delete).
+- Demo page: QR panel, demo corridor, one-run proof view.
+- Auth: login, register, magic link, password reset, OAuth buttons, re-auth, session expiry.
 
-- **Keep FastAPI backend on Render, untouched.** It's the tax engine, the source of correctness, and it already has auth, OAuth, treaties, and the Dijkstra kernel. Rebuilding that on Lovable Cloud would take months and risk correctness regressions on the exact thing you're pitching investors.
-- **Rebuild `frontend/` here on Scientific Ledger.** This Lovable project becomes the new frontend. It talks to `https://<render-host>/api/*` via a `VITE_API_BASE_URL` env var. On merge, the new build replaces the Render service's static frontend.
-- **Drop Lovable Cloud auth / `leads` table from this project.** Your real backend already owns auth, users, and leads. Keep the Lovable-Cloud lead form only if you want a marketing shadow list; otherwise remove it and point the marketing forms at `/api/leads` too. (Decision needed — see Open questions.)
+Our new site currently has landing, four audience pages, pricing, docs, about, contact, login, signup, OAuth callback, workspace index, scenario, results, account, admin. So the shells exist; the depth behind workspace, results, account, evidence, gating, assistant, and demo does not.
 
-## Route inventory to build
+## Working rules for this run
 
-Marketing (already partially done here — refine, don't rebuild):
-- `/` (home), `/about`, `/contact`, `/investors`, `/pilot`, `/corporations`, `/individuals`, `/sitemap.xml`
+- Batches are sized so each one ends with a green typecheck and a written progress note in `.lovable/progress-w2.md` (routes done, wiring done, what is next). If a batch is interrupted, the next run resumes from that file, so context is never lost.
+- I report an estimated and actual size at the start and end of each batch, and pause before the batch that would push us near the limit. On pause you get: what is done, what is left, and the exact sentence to send to continue (same chat, or a new chat if the history has grown too long, in which case the progress file is the handoff).
+- Copy rules applied everywhere: no AI phrasing, no filler, no em or en dashes, plain professional English, short sentences.
+- Design rules: reuse the existing tokens and Scientific Ledger and Maison editorial patterns from the landing page. Every page responsive from 360px to ultrawide, keyboard reachable, visible focus, real empty, loading, error, gated, and unsupported states.
+- Backend: `VITE_API_BASE_URL` points at the live Render service, and each batch verifies its own paths against the deployed API before I call it done.
 
-App shell (new — port from `frontend/src/`):
-- `/login` — email/pw + magic link + Google + Facebook (mirrors `AuthPage.tsx`)
-- `/signup` — new (repo uses `/login` for both; we'll split)
-- `/auth/callback` — OAuth landing
-- `/demo` — QR-gated demo scenario preview (mirrors demo flow)
-- `/workspace` — scenario picker + guided questionnaire + simulation runner
-- `/workspace/results/$runId` — RouteFlowChart, ComparisonTable, evidence panel, PDF export
-- `/pricing` — plan tiers + upgrade CTA (mirrors `PricingPage`)
-- `/account` — profile, avatar upload, run history, subscription, GDPR export/delete (mirrors `AccountPage`)
-- `/assistant` — chat UI wired to backend assistant endpoint
+## Batches
 
-Protected routes live under `_authenticated/` layout with a guard that redirects to `/login`.
+**Batch 0 — Contract lock and inventory (small)**
+Pull the exact request and response models from `src/data/schemas*.py` and the router signatures into a single local contract file. Point the client at the live Render base URL and verify `/health`, `/jurisdictions`, `/graph/summary`, `/auth/login`, `/simulate` respond as typed. Output: contract notes plus a route inventory table mapping every old surface to a new route.
 
-## Design system continuity
+**Batch 1 — Workspace entry and scenario setup**
+Entry fork, scenario tiles for the six golden scenarios, two-step setup with the guided questionnaire, search mode picker, flow stepper, scenario context and preamble. Wired to `/jurisdictions` and `/ui/conditions`. Persistence, deep links, and QR and magic-link entry params preserved.
 
-- Everything uses the locked Scientific Ledger tokens: navy `#052347`, teal `#14b8a6`, ghost `#f4f6fa`, Libre Baskerville / IBM Plex Sans / IBM Plex Mono.
-- Audience accents remain per-marketing-page.
-- App shell (workspace, results, account) gets its own subtle chrome variant: navy sidebar, white canvas, teal action color — still the same tokens, just denser.
-- Data viz (RouteFlowChart, MathProofTable, PlotlyChart) restyled with tokens instead of default Plotly palette.
+**Batch 2 — Route briefing and results**
+Results page rebuilt as an executive route briefing: route flow chart, retained percentage bands, math proof table, result panels, technical details, best destinations, coverage notice, disclaimer, CbCR and GIR exports. Wired to `/simulate`, `/simulate/top-paths`, `/simulate/export/*`.
 
-## Phased build (proposed)
+**Batch 3 — Evidence and gating**
+Legal evidence panel, citation cards, snippet excerpts with source pending and empty states, copy evidence. Gating layer driven by the server entitlement fields: locked teasers, blur reveal, citation teasers, paywall CTA into `/pricing`. Wired to `/documents/*`.
 
-Phase A — API client + auth (foundation, ~1 build session)
-- `src/lib/api.ts`: typed fetch client with `VITE_API_BASE_URL`, credentials, CSRF handling
-- `src/lib/auth/`: session hook (`useSession`) reading from backend, `_authenticated` layout guard
-- `/login`, `/signup`, `/auth/callback` routes, real Google + Facebook buttons hitting `/api/oauth/*`
-- Magic link redemption route
+**Batch 4 — Account and auth depth**
+Account shell with profile, security, subscription, history plus saved run editor, avatar upload, personalisation and theme, danger zone with GDPR export and delete. Auth completed: register, magic link, password reset, re-auth, session expiry handling, Google and Facebook OAuth against `/auth/oauth/*`.
 
-Phase B — Workspace + results (the product core)
-- `/workspace` scenario picker + guided questionnaire (port `ScenarioGuidedQuestionnaire`)
-- Simulation submit → results route
-- `RouteFlowChart`, `RouteComparisonTable`, `LegalEvidencePanel`, `MathProofTable` restyled
-- PDF export button (reuse `advisorPdfExport.ts`)
+**Batch 5 — Demo page and assistant**
+`/demo` as the one-run proof surface with QR panel and demo corridor. Assistant panel with starter prompts, workspace and results handoff, deep links, retry cooldown, gating banner, wired to `/ui/chat`. Analytics events to `/event/*`.
 
-Phase C — Account + pricing + paywall
-- `/account`: profile, avatar upload, run history, subscription, GDPR
-- `/pricing` + gating banners + upgrade CTA source tracking
-
-Phase D — Assistant chat + demo QR
-- `/assistant` chat UI wired to backend
-- `/demo` QR-redeem flow
-
-Phase E — Docs surface (from `.tex` + `.md`)
-- `/docs` or `/whitepaper` route rendering `WhitePaper.tex` + `Tech_Sprint_Documentation.tex` (converted MD or PDF hosted)
-- Optional; can defer if fundraise timeline is tight
-
-Phase F — Cutover
-- Set `VITE_API_BASE_URL` to prod Render host
-- Build → the resulting `dist/` replaces `frontend/dist/` on Render
-- Update `render.yaml` static path if needed
-- DNS stays on `taxsailor.com`
-
-Each phase merges to GitHub via the existing Lovable ↔ GitHub sync on this project's own repo, not the TaxSailor monorepo. **Handoff option**: at the end I emit a PR-shaped diff you copy into the TaxSailor repo, replacing `frontend/`.
+**Batch 6 — Sweep, performance, publish prep**
+Link audit across every route, head metadata per page, sitemap update, image and bundle pass, Lighthouse-style check on mobile and desktop, then the smoke checklist for production. After that you flip the repo back to private.
 
 ## Technical notes
 
-- **CORS**: FastAPI's `cors.py` will need the Lovable preview origin added (for dev). Prod is same-origin under Render.
-- **Auth cookies**: backend sets `httpOnly` session cookies; frontend uses `credentials: "include"`. No token storage in JS.
-- **OAuth redirect URIs**: register the Lovable preview URL as an allowed redirect in Google + Facebook consoles for staging.
-- **File uploads** (avatar, evidence PDFs): multipart POST to `/api/account/avatar` — no Lovable storage buckets needed.
-- **PDF export**: existing `advisorPdfExport.ts` uses jsPDF client-side; portable as-is.
-- **Framework mismatch**: source is Vite + react-router-dom; target is TanStack Start (SSR + file routing). We port components 1:1 but rewrite routing.
-- **Testing**: repo has extensive `*.test.ts` files. We don't port those in this pass; they belong to the monorepo's Vitest runner. We spot-check with Playwright screenshots during build.
+- Routes are added under `src/routes/`, authenticated surfaces under `src/routes/_authenticated/`, one file per URL, `createFileRoute` strings matching filenames.
+- Old URLs stay valid: `/demo`, `/workspace`, `/pricing`, `/account`, `/login` keep their paths so existing links and QR codes do not break.
+- Server-driven gating: entitlement fields from the API decide what is locked. The frontend never decides tier access on its own.
+- Shared logic ported into `src/lib/workspace/`, `src/lib/evidence/`, `src/lib/gating/`, `src/lib/account/`, keeping the naming from the old modules so future syncs are readable.
+- Admin console stays on mock data until backend admin endpoints exist. I will flag it rather than fake it.
 
-## Open questions before Phase A
+## What I need from you
 
-1. **Lead capture**: keep the Lovable Cloud `leads` table for marketing forms, or point marketing forms at `/api/leads` on Render so all leads land in one DB? (Recommend: point everything at `/api/leads`.)
-2. **OAuth in staging**: do you want me to wire Google + Facebook to hit the Render prod backend from the Lovable preview (needs redirect URIs added), or mock auth in preview and only wire real OAuth after cutover?
-3. **Cutover mechanism**: do you want the new frontend to fully replace `frontend/` in the TaxSailor monorepo (I emit a diff you PR), or run side-by-side on a subdomain like `app.taxsailor.com` while you A/B?
-4. **Docs page**: build `/whitepaper` from `WhitePaper.tex` in this pass, or defer until after fundraise?
-5. **Scope trim**: if 6 weeks feels long, which phase can we cut or defer? (My vote: defer Phase E docs and Phase D assistant chat — do A/B/C only for a fundraise-ready cutover.)
-
-## Out of scope this plan
-
-- No backend changes (FastAPI, Dijkstra engine, treaty data).
-- No Lovable Cloud Postgres migration of user data.
-- No new tax logic, no new jurisdictions.
-- No mobile app.
-- No CI/CD pipeline changes on Render.
+- Keep the repo public until Batch 0 finishes. I will tell you the moment it is safe to flip back.
+- The Render base URL for the deployed backend, and a test account (email and password) so I can verify authenticated paths end to end. If OAuth is configured for the production domain only, say so and I will verify the password path instead.
