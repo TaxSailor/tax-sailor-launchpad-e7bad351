@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ApiProxyTestRouteImport } from './routes/api/proxy-test'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -111,6 +112,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProxyTestRoute = ApiProxyTestRouteImport.update({
+  id: '/api/proxy-test',
+  path: '/api/proxy-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAssistantRoute = ApiAssistantRouteImport.update({
   id: '/api/assistant',
   path: '/api/assistant',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/api/assistant': typeof ApiAssistantRoute
+  '/api/proxy-test': typeof ApiProxyTestRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/api/assistant': typeof ApiAssistantRoute
+  '/api/proxy-test': typeof ApiProxyTestRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs': typeof DocsIndexRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/api/assistant': typeof ApiAssistantRoute
+  '/api/proxy-test': typeof ApiProxyTestRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/docs/$slug': typeof DocsSlugRoute
   '/docs/': typeof DocsIndexRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/api/assistant'
+    | '/api/proxy-test'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs/'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/api/assistant'
+    | '/api/proxy-test'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/api/assistant'
+    | '/api/proxy-test'
     | '/auth/callback'
     | '/docs/$slug'
     | '/docs/'
@@ -302,6 +314,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiAssistantRoute: typeof ApiAssistantRoute
+  ApiProxyTestRoute: typeof ApiProxyTestRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/proxy-test': {
+      id: '/api/proxy-test'
+      path: '/api/proxy-test'
+      fullPath: '/api/proxy-test'
+      preLoaderRoute: typeof ApiProxyTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/assistant': {
       id: '/api/assistant'
       path: '/api/assistant'
@@ -512,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiAssistantRoute: ApiAssistantRoute,
+  ApiProxyTestRoute: ApiProxyTestRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
