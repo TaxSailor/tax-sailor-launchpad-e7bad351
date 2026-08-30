@@ -130,90 +130,53 @@ function mapUser(u: UserResponse): User {
   };
 }
 
-// ---- Mock helpers ------------------------------------------------------
-
-function fakeUser(email: string): User {
-  return {
-    id: `mock-${email}`,
-    email,
-    role: email.endsWith("@taxsailor.com") ? "admin" : "user",
-    name: email.split("@")[0],
-    entitlement_tier: "anonymous",
-    email_verified: true,
-  };
-}
-
-function fakeSession(email: string): Session {
-  return {
-    token: `mock.${btoa(email)}.${Date.now()}`,
-    expires_at: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    user: fakeUser(email),
-  };
-}
-
 // ---- Auth actions ------------------------------------------------------
 
 async function fetchMe(): Promise<User> {
-  const u = await api.get<UserResponse>("/auth/me", {
-    mock: async () => ({ id: 1, email: "you@taxsailor.com", role: "guest", is_admin: false }),
-  });
+  const u = await api.get<UserResponse>("/auth/me");
   return mapUser(u);
 }
 
-function commitToken(t: TokenResponse, mockEmail?: string) {
-  return (async () => {
-    const user = IS_MOCK_API && mockEmail
-      ? fakeUser(mockEmail)
-      : await fetchMe();
-    setSession({
-      token: t.access_token,
-      expires_at: Date.now() + t.expires_in * 1000,
-      user,
-    });
-    return user;
-  })();
+async function commitToken(t: TokenResponse): Promise<User> {
+  // The login response carries no user object, so hydrate from /auth/me.
+  setSession({
+    token: t.access_token,
+    expires_at: Date.now() + t.expires_in * 1000,
+    user: { id: "pending", email: "", role: "user" },
+  });
+  const user = await fetchMe();
+  setSession({
+    token: t.access_token,
+    expires_at: Date.now() + t.expires_in * 1000,
+    user,
+  });
+  return user;
 }
 
 export async function login(email: string, password: string) {
-  const t = await api.post<TokenResponse>(
-    "/auth/login",
-    { email, password },
-    { mock: () => ({ access_token: fakeSession(email).token, expires_in: 3600 * 24 * 7 }), skipAuth: true },
-  );
-  return commitToken(t, email);
+  const t = await api.post<TokenResponse>("/auth/login", { email, password }, { skipAuth: true });
+  return commitToken(t);
 }
 
 export async function register(email: string, password: string) {
-  const t = await api.post<TokenResponse>(
-    "/auth/register",
-    { email, password },
-    { mock: () => ({ access_token: fakeSession(email).token, expires_in: 3600 * 24 * 7 }), skipAuth: true },
-  );
-  return commitToken(t, email);
+  const t = await api.post<TokenResponse>("/auth/register", { email, password }, { skipAuth: true });
+  return commitToken(t);
 }
 
 export async function requestMagicLink(email: string) {
-  return api.post<MagicLinkCreatedResponse>(
-    "/auth/magic-link",
-    { email },
-    { mock: () => ({ message: "Check your inbox.", expires_in: 900 }), skipAuth: true },
-  );
+  return api.post<MagicLinkCreatedResponse>("/auth/magic-link", { email }, { skipAuth: true });
 }
 
 export async function redeemMagicLink(token: string) {
-  const t = await api.post<TokenResponse>(
-    "/auth/magic-link",
-    { token },
-    { mock: () => ({ access_token: fakeSession("magic@taxsailor.com").token, expires_in: 3600 }), skipAuth: true },
-  );
-  return commitToken(t, "magic@taxsailor.com");
+  const t = await api.post<TokenResponse>("/auth/magic-link", { token }, { skipAuth: true });
+  return commitToken(t);
 }
 
 export async function forgotPassword(email: string) {
   return api.post<PasswordResetRequestedResponse>(
     "/auth/forgot-password",
     { email },
-    { mock: () => ({ message: "Check your inbox.", expires_in: 900 }), skipAuth: true },
+    { skipAuth: true },
   );
 }
 
@@ -221,54 +184,35 @@ export async function resetPassword(token: string, password: string) {
   const t = await api.post<TokenResponse>(
     "/auth/reset-password",
     { token, password },
-    { mock: () => ({ access_token: fakeSession("reset@taxsailor.com").token, expires_in: 3600 * 24 * 7 }), skipAuth: true },
+    { skipAuth: true },
   );
-  return commitToken(t, "reset@taxsailor.com");
+  return commitToken(t);
 }
 
+/**
+ * Browser redirect to the backend OAuth authorize endpoint. The backend is
+ * mounted at /api on the same origin in production; the return_to points back
+ * at our callback route, which reads the token from the query string.
+ */
 export function signInWithOAuth(provider: "google" | "facebook", returnTo = "/workspace") {
-  if (IS_MOCK_API) {
-    const url = new URL(window.location.origin + "/auth/callback");
-    url.searchParams.set("provider", provider);
-    url.searchParams.set("mock", "1");
-    url.searchParams.set("return_to", returnTo);
-    window.location.href = url.toString();
-    return;
-  }
-  // Backend endpoint: GET /oauth/{provider}/authorize?return_to=...
-  const url = new URL(`${window.location.origin}/oauth/${provider}/authorize`);
-  // For real cross-origin backend, use API_BASE_URL directly:
-  const { API_BASE_URL } = require("@/lib/api") as typeof import("@/lib/api");
-  const target = API_BASE_URL
-    ? new URL(`${API_BASE_URL}/oauth/${provider}/authorize`)
-    : url;
-  target.searchParams.set("return_to", `${window.location.origin}/auth/callback?return_to=${encodeURIComponent(returnTo)}`);
+  const target = new URL(`${window.location.origin}/api/auth/oauth/${provider}/authorize`);
+  target.searchParams.set(
+    "return_to",
+    `${window.location.origin}/auth/callback?return_to=${encodeURIComponent(returnTo)}`,
+  );
   window.location.href = target.toString();
 }
 
 export async function completeOAuthCallback(params: URLSearchParams): Promise<User> {
-  if (params.get("mock") === "1") {
-    const email = `${params.get("provider") ?? "oauth"}@taxsailor.com`;
-    const s = fakeSession(email);
-    setSession(s);
-    return s.user;
-  }
   // Backend redirects with either ?access_token=...&expires_in=... or ?token=...
   const token = params.get("access_token") ?? params.get("token");
   const expiresIn = Number(params.get("expires_in") ?? 3600);
   if (!token) throw new Error("Missing access token in OAuth callback");
-  // Persist a placeholder session then hydrate via /auth/me.
-  setSession({
-    token,
-    expires_at: Date.now() + expiresIn * 1000,
-    user: { id: "pending", email: "", role: "user" },
-  });
-  const user = await fetchMe();
-  setSession({ token, expires_at: Date.now() + expiresIn * 1000, user });
-  return user;
+  return commitToken({ access_token: token, expires_in: expiresIn });
 }
 
 export async function logout() {
-  // No server-side session to revoke — bearer tokens are stateless.
+  // Bearer tokens are stateless, so sign-out clears local state only.
   setSession(null);
 }
+
