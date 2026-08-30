@@ -1,2 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /workspace
+Disallow: /account
+Disallow: /admin
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth/callback
+
+Sitemap: https://www.taxsailor.com/sitemap.xml
