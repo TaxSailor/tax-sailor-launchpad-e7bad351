@@ -64,3 +64,38 @@ Health:    /health
 ## Batch 4 — Account/auth depth, security, GDPR, avatar, saved-run editor, OAuth — TODO
 ## Batch 5 — Demo + assistant, QR flow, chat handoff, gating, analytics — TODO
 ## Batch 6 — Links, metadata, images, bundle/performance, responsive, deploy, repo private — TODO
+
+## Batch 0 verification closed (2026-08-30)
+
+Authenticated verification against https://www.taxsailor.com/api using the
+provided admin account:
+
+- POST /auth/login -> 200, returns { access_token, token_type, expires_in }.
+  The user object is NOT part of the login response; the client must call
+  /auth/me after login.
+- GET /auth/me -> 200. role=admin, entitlement_tier=admin, is_admin=true,
+  email_verified=true, has_password=true. Also returns display_name,
+  avatar_url, oauth_provider, oauth_import_profile_enabled,
+  oauth_profile_available, advisor_plan_label, simulation_credits_remaining,
+  simulation_credits_allowance.
+- GET /account/profile -> 200 (locale, marketing_opt_in, avatar_uploaded).
+- GET /account/subscription -> 200 (plan_id=admin, plan_label,
+  status/status_label, upgrade_pricing_tier_id, contact_to_upgrade,
+  upgrade_message).
+- GET /account/runs -> 200 { total, limit, offset, runs: [] } (no saved runs
+  on this account yet).
+- POST /simulate requires source_country, target_country, user_profile
+  (mode optional, defaults to corporate). Germany -> UAE as admin returned
+  gated=false, retained_earnings_pct=70, tax_leakage_pct=30,
+  optimal_path=[Germany, Bahrain, United Arab Emirates], retained_pct_band=null.
+- POST /simulate/top-paths -> 200 with ranked paths incl. path_details
+  (from_jurisdiction, to_jurisdiction, wht_rate_pct, edge_type, is_statutory),
+  hops, masks, best_label_eligible.
+- Preview transport confirmed: the server proxy reached /api/health with
+  status 200 from the preview runtime, so the CORS restriction is bypassed
+  as designed.
+
+Contract corrections to apply in Batch 1:
+- Path detail fields are from_jurisdiction/to_jurisdiction/wht_rate_pct,
+  not from_country/to_country/wht_rate.
+- Login must be a two-step flow: /auth/login then /auth/me.
