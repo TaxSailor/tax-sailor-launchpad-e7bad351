@@ -30,25 +30,25 @@ const team = [
     img: nicolasImg,
     name: "Nicolas Seitz",
     role: "Co-Founder · CEO",
-    bio: "Tax practitioner. Built the treaty corpus and validation methodology behind TaxSailor.",
+    bio: "Tax advisor and originator of the TaxSailor concept. Three decades of cross-border practice and the client network anchoring our first pilots.",
   },
   {
     img: petarImg,
     name: "Petar Nedyalkov",
     role: "Co-Founder · CPO",
-    bio: "3,000+ document ingestion pipeline and jurisdiction-versioning system.",
+    bio: "Engineer turned product lead. Owns the 3,000-document ingestion pipeline, jurisdiction versioning, and the workspace experience.",
   },
   {
     img: hristoImg,
     name: "Hristo Andreev",
     role: "Co-Founder · COO",
-    bio: "Cross-border product operator. Owns roadmap, GTM, and pilot partnerships.",
+    bio: "Strategy and go-to-market. Runs positioning, partner pipeline, and the operational roadmap from first contact to paid pilot.",
   },
   {
     img: angelImg,
     name: "Angel Barov",
     role: "Co-Founder · CTO",
-    bio: "Systems and graph engineering. Author of the log-transformed pathing engine.",
+    bio: "Systems and graph engineer. Author of the log-transformed pathing engine and the deterministic routing core behind every result.",
   },
 ];
 
