@@ -30,7 +30,7 @@ const team = [
     img: nicolasImg,
     name: "Nicolas Seitz",
     role: "Co-Founder · CEO",
-    bio: "Tax advisor and originator of the TaxSailor concept. Three decades of cross-border practice and the client network anchoring our first pilots.",
+    bio: "Consultant with a PhD and a decade of independent practice across value creation, business development, cost optimization, interim management, procurement, transformation, and geopolitical risk. Originator of the TaxSailor concept and the network behind our first pilots.",
   },
   {
     img: petarImg,
