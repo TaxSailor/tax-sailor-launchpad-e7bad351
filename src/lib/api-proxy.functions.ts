@@ -27,10 +27,12 @@ const inputSchema = z.object({
   token: z.string().optional(),
 });
 
+type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
 export type ProxyResult = {
   ok: boolean;
   status: number;
-  body: unknown;
+  body: Json;
 };
 
 export const backendProxy = createServerFn({ method: "POST" })
