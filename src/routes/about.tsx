@@ -29,28 +29,29 @@ const team = [
   {
     img: nicolasImg,
     name: "Nicolas Seitz",
-    role: "Co-Founder · Tax & Advisory",
+    role: "Co-Founder · CEO",
     bio: "Tax practitioner. Built the treaty corpus and validation methodology behind TaxSailor.",
+  },
+  {
+    img: petarImg,
+    name: "Petar Nedyalkov",
+    role: "Co-Founder · CPO",
+    bio: "3,000+ document ingestion pipeline and jurisdiction-versioning system.",
   },
   {
     img: hristoImg,
     name: "Hristo Andreev",
-    role: "Co-Founder · Product & Strategy",
+    role: "Co-Founder · COO",
     bio: "Cross-border product operator. Owns roadmap, GTM, and pilot partnerships.",
   },
   {
     img: angelImg,
     name: "Angel Barov",
-    role: "Co-Founder · Engineering",
+    role: "Co-Founder · CTO",
     bio: "Systems and graph engineering. Author of the log-transformed pathing engine.",
   },
-  {
-    img: petarImg,
-    name: "Petar Nedyalkov",
-    role: "Co-Founder · Data & Research",
-    bio: "3,000+ document ingestion pipeline and jurisdiction-versioning system.",
-  },
 ];
+
 
 function AboutPage() {
   return (
