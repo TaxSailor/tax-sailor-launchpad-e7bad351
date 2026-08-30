@@ -1,13 +1,10 @@
 // Floating assistant chat — mounted inside the authenticated workspace layout.
-// Real mode: POST to the FastAPI backend at /ui/chat.
-// Mock mode (no VITE_API_BASE_URL): POST to the local /api/assistant edge
-// route that proxies Lovable AI Gateway. Both take the full history each turn.
+// Posts the trailing history to the backend at /ui/chat on every turn.
 
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
-import { API_BASE_URL, IS_MOCK_API, ApiError } from "@/lib/api";
-import { getAuthToken } from "@/lib/auth/session";
+import { api } from "@/lib/api";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -15,50 +12,15 @@ const SEED: Msg[] = [
   {
     role: "assistant",
     content:
-      "Hi — I'm the **TaxSailor Assistant**. Ask me anything about the workspace, our pricing tiers, or general cross-border tax concepts. I'm not a licensed advisor, so for anything binding, book a call via /contact.",
+      "Hi, I'm the **TaxSailor Assistant**. Ask me anything about the workspace, our pricing tiers, or general cross-border tax concepts. I'm not a licensed advisor, so for anything binding, book a call via /contact.",
   },
 ];
 
 async function callBackend(messages: Msg[]): Promise<string> {
-  const url = `${API_BASE_URL}/ui/chat`;
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-  const token = getAuthToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ messages }),
-  });
-  const text = await res.text();
-  let body: unknown = null;
-  try { body = text ? JSON.parse(text) : null; } catch { body = text; }
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    if (body && typeof body === "object" && "detail" in body) {
-      const d = (body as { detail: unknown }).detail;
-      if (typeof d === "string") msg = d;
-    }
-    throw new ApiError(msg, res.status, body);
-  }
-  const reply = (body && typeof body === "object" && "reply" in body)
-    ? String((body as { reply: unknown }).reply ?? "")
-    : "";
-  return reply;
+  const res = await api.post<{ reply?: string }>("/ui/chat", { messages });
+  return res.reply ?? "";
 }
 
-async function callMockGateway(messages: Msg[]): Promise<string> {
-  const res = await fetch("/api/assistant", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages }),
-  });
-  const data = (await res.json()) as { reply?: string; error?: string };
-  if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
-  return data.reply ?? "";
-}
 
 export function AssistantChat() {
   const [open, setOpen] = useState(false);
