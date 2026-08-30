@@ -9,7 +9,7 @@
 //   /auth/me, /simulate, /account/profile, /leads/pricing, /ui/chat, ...
 // The proxy prepends /api to match the production mount in production_app.py.
 
-import { backendProxy, type ProxyResult } from "@/lib/api-proxy.functions";
+import { backendProxy, backendUpload, type ProxyResult } from "@/lib/api-proxy.functions";
 
 export class ApiError extends Error {
   status: number;
@@ -77,4 +77,31 @@ export const api = {
     apiFetch<T>(path, { method: "PATCH", body: data !== undefined ? JSON.stringify(data) : undefined, ...opts }),
   del: <T>(path: string, opts: CallOpts = {}) =>
     apiFetch<T>(path, { method: "DELETE", ...opts }),
+  /** Multipart upload of a single file field named "file". */
+  upload: async <T>(path: string, file: File): Promise<T> => {
+    const token = await getAuthToken();
+    const base64 = await fileToBase64(file);
+    const result = await backendUpload({
+      data: {
+        path,
+        filename: file.name || "upload",
+        contentType: file.type || "application/octet-stream",
+        base64,
+        token: token ?? undefined,
+      },
+    });
+    raiseIfNotOk(result, path);
+    return result.body as T;
+  },
 };
+
+async function fileToBase64(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
