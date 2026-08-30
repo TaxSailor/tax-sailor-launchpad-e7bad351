@@ -99,3 +99,51 @@ Contract corrections to apply in Batch 1:
 - Path detail fields are from_jurisdiction/to_jurisdiction/wht_rate_pct,
   not from_country/to_country/wht_rate.
 - Login must be a two-step flow: /auth/login then /auth/me.
+
+## Batch 1 — Workspace entry, scenarios, questionnaire, search, persistence — DONE (2026-08-30)
+
+Contract corrections discovered from the live OpenAPI document
+(https://www.taxsailor.com/api/openapi.json):
+- GET /jurisdictions returns `{ jurisdictions: [{ code, name }] }` (125 rows).
+  Simulation endpoints take and return jurisdiction NAMES ("Germany",
+  "United Arab Emirates"); ISO codes are only used to render flags.
+- PathEdgeDetail = from_jurisdiction, to_jurisdiction, wht_rate_pct,
+  edge_type, is_statutory (no note field).
+- AssetType enum: shares_listed, shares_unlisted, real_estate, ip_rights,
+  business_interest, financial_assets, mixed (no cash_equivalents /
+  business_operating — those were wrong before).
+- FamilyStatus enum: single, married, married_with_children,
+  single_with_children (no "family").
+- OAuth routes are /auth/oauth/... not /oauth/... — fix in Batch 4.
+- Saved runs: GET/PATCH/DELETE /account/runs/{id}; no POST (the backend
+  persists runs itself). Account delete is POST /account/delete.
+- Gating fields available: retained_pct_band, retained_pct_masked,
+  tax_leakage_pct_masked, savings_band_eur, citation_teasers,
+  compliance_flag_count, teaser_headline, best_label_eligible.
+
+Shipped:
+- `src/lib/workspace/jurisdictions.ts`: catalogue loader + cache, name->code
+  map, flagFor(), searchJurisdictions().
+- `src/components/workspace/JurisdictionSelect.tsx`: searchable, keyboard
+  accessible combobox over all 125 jurisdictions, 44px targets.
+- `src/lib/workspace/scenarios.ts` rewritten: correct enums, name-based wire
+  values, per-scenario defaults, richer UserProfile (risk appetite, substance,
+  dependents, heir countries, asset location, annual profit), session run
+  index (`listRecentRuns`), and `loadRunFromAccount()` so numeric run ids
+  deep-link across sessions. All mock branches removed.
+- Workspace index redesigned: audience filter, corridor preview per scenario,
+  "this session" snapshots, saved-runs list from /account/runs.
+- Questionnaire redesigned in three numbered sections (corridor, scale,
+  profile) with corridor swap, amount presets, risk-appetite cards, deep-link
+  search params (?from=&to=&amount=), inline error surface.
+- Results page fixed to the real contract: name+flag route chips, correct
+  per-hop columns, treaty vs statutory basis, citation teasers, band/masked
+  values when gated, statutory-edge notes, "Adjust inputs" deep link back to
+  the questionnaire, account-run rehydration with loading and empty states.
+- Typecheck green (npx tsgo --noEmit).
+
+Carry into Batch 2:
+- Top-K alternate paths UI (`runTopPaths` client exists, no UI yet).
+- /simulate/best-destinations, /simulate/export/cbcr, /simulate/export/gir.
+- Retire the remaining IS_MOCK_API / API_BASE_URL references in
+  AuthShell.tsx, AssistantChat.tsx and auth/session.ts.

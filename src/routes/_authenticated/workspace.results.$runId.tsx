@@ -1,11 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { getCachedRun, flagEmoji, type WorkspaceRun, type PathEdgeDetail } from "@/lib/workspace/scenarios";
+import { useEffect, useState } from "react";
+import {
+  getCachedRun,
+  loadRunFromAccount,
+  type PathEdgeDetail,
+  type WorkspaceRun,
+} from "@/lib/workspace/scenarios";
+import { flagFor } from "@/lib/workspace/jurisdictions";
 
 export const Route = createFileRoute("/_authenticated/workspace/results/$runId")({
-  head: ({ params }) => ({
+  head: () => ({
     meta: [
-      { title: `Run ${params.runId} — TaxSailor` },
+      { title: "Optimisation result — Workspace · TaxSailor" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -14,23 +20,50 @@ export const Route = createFileRoute("/_authenticated/workspace/results/$runId")
 
 function ResultsPage() {
   const { runId } = Route.useParams();
-  const data = useMemo<WorkspaceRun | null>(() => getCachedRun(runId), [runId]);
+  const [data, setData] = useState<WorkspaceRun | null>(() => getCachedRun(runId));
+  const [loading, setLoading] = useState(!data);
+
+  useEffect(() => {
+    const cached = getCachedRun(runId);
+    if (cached) {
+      setData(cached);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    loadRunFromAccount(runId)
+      .then((r) => setData(r))
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
+  }, [runId]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-teal">Loading run</p>
+        <div className="mx-auto mt-6 h-1 w-40 overflow-hidden rounded-full bg-navy/10">
+          <div className="h-full w-1/2 animate-pulse bg-teal" />
+        </div>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-red-600">Run unavailable</p>
-        <h1 className="mt-2 font-serif text-3xl text-navy">
-          This run isn't in this session's cache.
-        </h1>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-navy/50">
+          Run unavailable
+        </p>
+        <h1 className="mt-2 font-serif text-3xl text-navy">This run is no longer available</h1>
         <p className="mt-2 text-sm text-navy/60">
-          Simulation snapshots are held in this browser tab only. Run the scenario again to view fresh results.
+          Session snapshots are held in this browser tab only. Run the scenario again to see a fresh
+          result, or open a run saved on your account.
         </p>
         <Link
           to="/workspace"
-          className="mt-6 inline-block rounded-sm bg-navy px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
+          className="mt-6 inline-flex min-h-11 items-center rounded-sm bg-navy px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
         >
-          ← Back to scenarios
+          Back to scenarios
         </Link>
       </div>
     );
@@ -38,34 +71,45 @@ function ResultsPage() {
 
   const fmt = (n: number) =>
     n.toLocaleString("en-US", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-  const pct = (n: number | null | undefined) =>
-    n == null ? "—" : `${n.toFixed(2)}%`;
+  const pct = (n: number | null | undefined, masked?: string | null) =>
+    n == null ? (masked ?? "locked") : `${n.toFixed(2)}%`;
 
   const retainedPct = data.retained_earnings_pct ?? null;
   const retainedAmount = retainedPct != null ? (retainedPct / 100) * data.amount : null;
   const path = data.optimal_path ?? [];
+  const hops = data.hop_count ?? Math.max(0, path.length - 1);
+  const verified = data.best_label_eligible !== false && !data.uses_statutory_edges;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+    <div className="mx-auto max-w-6xl px-6 py-10 md:py-16">
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <Link to="/workspace" className="font-mono text-[11px] uppercase tracking-widest text-teal">
-            ← Scenarios
+          <Link
+            to="/workspace"
+            className="inline-flex min-h-11 items-center font-mono text-[11px] uppercase tracking-widest text-teal"
+          >
+            Scenarios
           </Link>
-          <p className="mt-4 font-mono text-[11px] uppercase tracking-widest text-navy/50">
+          <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-navy/50">
             {data.scenarioLabel} · Run {data.runId.slice(0, 8)}
           </p>
           <h1 className="mt-1 font-serif text-3xl text-navy md:text-4xl">Optimisation result</h1>
+          <p className="mt-2 font-mono text-[11px] text-navy/55">
+            {verified ? "Treaty edges only" : "Includes statutory edges"} ·{" "}
+            {data.entitlement_tier ? `tier ${data.entitlement_tier}` : "tier resolved server-side"}
+          </p>
         </div>
-        <div className="text-right">
+        <div className="md:text-right">
           <p className="font-mono text-[10px] uppercase tracking-widest text-navy/50">
             Retained after tax
           </p>
           <p className="mt-1 font-serif text-3xl text-teal">
-            {retainedAmount != null ? fmt(retainedAmount) : "—"}
+            {retainedAmount != null ? fmt(retainedAmount) : (data.savings_band_eur ?? "Locked")}
           </p>
           <p className="mt-1 font-mono text-[11px] text-navy/60">
-            {retainedPct != null ? `${retainedPct.toFixed(2)}% of ${fmt(data.amount)}` : (data.teaser_headline ?? "Locked preview")}
+            {retainedPct != null
+              ? `${retainedPct.toFixed(2)}% of ${fmt(data.amount)}`
+              : (data.retained_pct_band ?? data.teaser_headline ?? "Locked preview")}
           </p>
         </div>
       </div>
@@ -76,60 +120,70 @@ function ResultsPage() {
           {path.length === 0 ? (
             <span className="font-mono text-xs text-navy/60">No route computed.</span>
           ) : (
-            path.map((iso, i) => (
-              <div key={`${iso}-${i}`} className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-navy/15 bg-ghost px-3 py-1.5 font-mono text-sm text-navy">
-                  <span aria-hidden="true">{flagEmoji(iso)}</span>
-                  <span>{iso}</span>
+            path.map((name, i) => (
+              <div key={`${name}-${i}`} className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-navy/15 bg-ghost px-3 py-1.5 text-sm text-navy">
+                  <span aria-hidden="true">{flagFor(name)}</span>
+                  <span>{name}</span>
                 </span>
                 {i < path.length - 1 && (
-                  <span className="font-mono text-navy/40">→</span>
+                  <span aria-hidden="true" className="font-mono text-navy/40">
+                    &gt;
+                  </span>
                 )}
               </div>
             ))
           )}
         </div>
+        {data.optimality_note && (
+          <p className="mt-4 border-t border-navy/5 pt-3 font-mono text-[11px] text-navy/55">
+            {data.optimality_note}
+          </p>
+        )}
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Stat label="Retained (τ_kept)" value={pct(data.retained_earnings_pct)} accent="teal" />
-        <Stat label="Tax leakage (τ_lost)" value={pct(data.tax_leakage_pct)} />
         <Stat
-          label="Hops on path"
-          value={String(data.hop_count ?? Math.max(0, path.length - 1))}
-          mono
+          label="Retained"
+          value={pct(data.retained_earnings_pct, data.retained_pct_masked)}
+          accent="teal"
         />
+        <Stat label="Tax leakage" value={pct(data.tax_leakage_pct, data.tax_leakage_pct_masked)} />
+        <Stat label="Hops on path" value={String(hops)} mono />
       </div>
 
       {data.path_details && data.path_details.length > 0 && (
-        <div className="mt-8 rounded-sm border border-navy/10 bg-white p-6">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-teal">Per-hop breakdown</p>
-          <table className="mt-4 w-full text-left text-sm">
+        <div className="mt-8 overflow-x-auto rounded-sm border border-navy/10 bg-white p-6">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-teal">
+            Per-hop breakdown
+          </p>
+          <table className="mt-4 w-full min-w-[520px] text-left text-sm">
             <thead className="font-mono text-[10px] uppercase tracking-widest text-navy/50">
               <tr>
                 <th className="pb-2 pr-4">From</th>
                 <th className="pb-2 pr-4">To</th>
-                <th className="pb-2 pr-4">WHT / rate</th>
+                <th className="pb-2 pr-4">Withholding</th>
                 <th className="pb-2 pr-4">Edge</th>
-                <th className="pb-2">Note</th>
+                <th className="pb-2">Basis</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-navy/5">
               {data.path_details.map((h: PathEdgeDetail, i) => (
                 <tr key={i}>
-                  <td className="py-2 pr-4 font-mono text-xs">
-                    {h.from_country ? `${flagEmoji(String(h.from_country))} ${h.from_country}` : "—"}
+                  <td className="py-2 pr-4 text-xs">
+                    <span aria-hidden="true">{flagFor(h.from_jurisdiction)}</span>{" "}
+                    {h.from_jurisdiction}
+                  </td>
+                  <td className="py-2 pr-4 text-xs">
+                    <span aria-hidden="true">{flagFor(h.to_jurisdiction)}</span> {h.to_jurisdiction}
                   </td>
                   <td className="py-2 pr-4 font-mono text-xs">
-                    {h.to_country ? `${flagEmoji(String(h.to_country))} ${h.to_country}` : "—"}
+                    {typeof h.wht_rate_pct === "number" ? `${h.wht_rate_pct.toFixed(2)}%` : "n/a"}
                   </td>
-                  <td className="py-2 pr-4 font-mono text-xs">
-                    {typeof h.wht_rate === "number" ? `${h.wht_rate.toFixed(2)}%` : "—"}
+                  <td className="py-2 pr-4 font-mono text-xs text-navy/60">{h.edge_type}</td>
+                  <td className="py-2 text-xs text-navy/70">
+                    {h.is_statutory ? "Domestic statutory rate" : "Treaty rate"}
                   </td>
-                  <td className="py-2 pr-4 font-mono text-xs text-navy/60">
-                    {String(h.edge_type ?? "—")}
-                  </td>
-                  <td className="py-2 text-xs text-navy/70">{String(h.note ?? "")}</td>
                 </tr>
               ))}
             </tbody>
@@ -137,8 +191,30 @@ function ResultsPage() {
         </div>
       )}
 
+      {(data.citation_teasers?.length ?? 0) > 0 && (
+        <div className="mt-6 rounded-sm border border-navy/10 bg-white p-6">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-teal">Legal basis</p>
+          <ul className="mt-3 space-y-2 text-sm text-navy/80">
+            {data.citation_teasers!.map((c, i) => (
+              <li key={i} className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-navy/50">
+                  {c.citation_type}
+                </span>
+                <span>{c.title}</span>
+                {c.wht_rate_masked && (
+                  <span className="font-mono text-xs text-navy/40">{c.wht_rate_masked}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {(data.compliance_warnings?.length ?? 0) > 0 && (
         <NoteBlock title="Compliance warnings" tone="warn" items={data.compliance_warnings} />
+      )}
+      {(data.statutory_edge_details?.length ?? 0) > 0 && (
+        <NoteBlock title="Statutory edges used" tone="info" items={data.statutory_edge_details} />
       )}
       {(data.limitations?.length ?? 0) > 0 && (
         <NoteBlock title="Model limitations" tone="info" items={data.limitations ?? []} />
@@ -150,7 +226,7 @@ function ResultsPage() {
         <NoteBlock
           title="Unmapped jurisdictions"
           tone="info"
-          items={data.unmapped_jurisdictions.map((j) => `${flagEmoji(j)} ${j}`)}
+          items={data.unmapped_jurisdictions.map((j) => `${flagFor(j)} ${j}`)}
         />
       )}
 
@@ -164,24 +240,27 @@ function ResultsPage() {
         <div className="mt-10 rounded-sm border-2 border-teal/40 bg-teal/5 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-widest text-teal">Preview tier</p>
-              <h3 className="mt-1 font-serif text-xl text-navy">
-                {data.teaser_headline ?? "Unlock the full report and legal appendix"}
-              </h3>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-teal">
+                Locked fields
+              </p>
+              <h2 className="mt-1 font-serif text-xl text-navy">
+                {data.teaser_headline ?? "Unlock exact figures and the legal appendix"}
+              </h2>
               <p className="mt-1 text-sm text-navy/70">
-                Consumer reports from €99. Advisor licences from €199/mo. Verified rates, top-K alternate paths, and export-ready deliverables.
+                Paid tiers return exact retained and leakage figures, alternate ranked routes,
+                verified citations and export-ready deliverables.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
                 to="/pricing"
-                className="rounded-sm bg-navy px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
+                className="min-h-11 rounded-sm bg-navy px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
               >
                 View plans
               </Link>
               <Link
                 to="/account"
-                className="rounded-sm border border-navy/20 bg-white px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-navy hover:border-teal hover:text-teal"
+                className="min-h-11 rounded-sm border border-navy/20 bg-white px-4 py-2.5 font-mono text-[11px] uppercase tracking-widest text-navy hover:border-teal hover:text-teal"
               >
                 Manage account
               </Link>
@@ -192,29 +271,58 @@ function ResultsPage() {
 
       <div className="mt-8 flex flex-wrap gap-3">
         {data.oecd_cbcr_xml && (
-          <DownloadButton label="OECD CbCR XML" filename={`cbcr_${data.runId}.xml`} content={data.oecd_cbcr_xml} />
+          <DownloadButton
+            label="OECD CbCR XML"
+            filename={`cbcr_${data.runId}.xml`}
+            content={data.oecd_cbcr_xml}
+          />
         )}
         {data.globe_gir_xml && (
-          <DownloadButton label="GloBE GIR XML" filename={`gir_${data.runId}.xml`} content={data.globe_gir_xml} />
+          <DownloadButton
+            label="GloBE GIR XML"
+            filename={`gir_${data.runId}.xml`}
+            content={data.globe_gir_xml}
+          />
         )}
         <button
+          type="button"
           onClick={() => window.print()}
-          className="rounded-sm border border-navy/15 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-navy hover:border-navy"
+          className="min-h-11 rounded-sm border border-navy/15 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-navy hover:border-navy"
         >
-          Export PDF
+          Print report
         </button>
         <Link
-          to="/workspace"
-          className="rounded-sm bg-navy px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
+          to="/workspace/scenario/$scenarioId"
+          params={{ scenarioId: data.scenarioId }}
+          search={{
+            from: data.input.origin,
+            to: data.input.destination,
+            amount: data.amount,
+          }}
+          className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white"
         >
-          New scenario →
+          Adjust inputs
+        </Link>
+        <Link
+          to="/workspace"
+          className="min-h-11 rounded-sm bg-navy px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-white hover:bg-teal"
+        >
+          New scenario
         </Link>
       </div>
     </div>
   );
 }
 
-function DownloadButton({ label, filename, content }: { label: string; filename: string; content: string }) {
+function DownloadButton({
+  label,
+  filename,
+  content,
+}: {
+  label: string;
+  filename: string;
+  content: string;
+}) {
   const onClick = () => {
     const blob = new Blob([content], { type: "application/xml" });
     const url = URL.createObjectURL(blob);
@@ -226,15 +334,24 @@ function DownloadButton({ label, filename, content }: { label: string; filename:
   };
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white"
+      className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white"
     >
-      ↓ {label}
+      {label}
     </button>
   );
 }
 
-function NoteBlock({ title, tone, items }: { title: string; tone: "warn" | "info"; items: string[] }) {
+function NoteBlock({
+  title,
+  tone,
+  items,
+}: {
+  title: string;
+  tone: "warn" | "info";
+  items: string[];
+}) {
   const styles =
     tone === "warn"
       ? "border-amber-300 bg-amber-50 text-amber-900"
