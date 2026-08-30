@@ -87,6 +87,7 @@ function ResultsPage() {
   const path = data.optimal_path ?? [];
   const hops = data.hop_count ?? Math.max(0, path.length - 1);
   const verified = data.best_label_eligible !== false && !data.uses_statutory_edges;
+  const scenario = getScenario(data.scenarioId);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 md:py-16">
@@ -328,6 +329,54 @@ function ResultsPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+function ExportButton({
+  label,
+  kind,
+  filename,
+  inline,
+  request,
+}: {
+  label: string;
+  kind: ExportKind;
+  filename: string;
+  inline: string | null;
+  request: SimulationRequestPayload;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onClick() {
+    setError(null);
+    if (inline) {
+      downloadText(filename, inline);
+      return;
+    }
+    setBusy(true);
+    try {
+      const xml = await fetchExportXml(kind, request);
+      downloadText(filename, xml);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export unavailable on your plan.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <span className="inline-flex flex-col gap-1">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={busy}
+        className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white disabled:opacity-50"
+      >
+        {busy ? "Preparing" : label}
+      </button>
+      {error && <span className="max-w-56 text-[11px] text-amber-800">{error}</span>}
+    </span>
   );
 }
 
