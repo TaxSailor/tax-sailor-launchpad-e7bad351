@@ -13,6 +13,8 @@ import {
 } from "@/lib/workspace/scenarios";
 import { AlternateRoutes } from "@/components/workspace/AlternateRoutes";
 import { BestDestinations } from "@/components/workspace/BestDestinations";
+import { EvidencePanel } from "@/components/workspace/EvidencePanel";
+
 import { flagFor } from "@/lib/workspace/jurisdictions";
 
 
@@ -245,6 +247,13 @@ function ResultsPage() {
           <BestDestinations scenario={scenario} input={data.input} />
         </>
       )}
+
+      <EvidencePanel
+        path={path}
+        pathDetails={data.path_details ?? null}
+        complianceWarnings={data.compliance_warnings ?? null}
+      />
+
 
 
       {data.compliance_pending_notice && (
