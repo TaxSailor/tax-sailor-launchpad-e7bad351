@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, TrendingUp, Users, MapPin, Clock } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/investors")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/investors")({
       },
       { property: "og:url", content: "/investors" },
     ],
-    links: [{ rel: "canonical", href: "/investors" }],
+    links: [{ rel: "canonical", href: canonical("/investors") }],
   }),
   component: InvestorsPage,
 });

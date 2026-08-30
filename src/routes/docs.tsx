@@ -8,7 +8,6 @@ export const Route = createFileRoute("/docs")({
       { property: "og:title", content: "TaxSailor Docs" },
       { property: "og:description", content: "Product, method, and trust — one article each." },
     ],
-    links: [{ rel: "canonical", href: "/docs" }],
   }),
   component: DocsLayout,
 });

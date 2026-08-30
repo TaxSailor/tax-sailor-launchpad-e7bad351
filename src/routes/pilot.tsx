@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/pilot")({
   head: () => ({
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/pilot")({
       { property: "og:description", content: "5–10 DACH boutique advisory firms. 30-day free access." },
       { property: "og:url", content: "/pilot" },
     ],
-    links: [{ rel: "canonical", href: "/pilot" }],
+    links: [{ rel: "canonical", href: canonical("/pilot") }],
   }),
   component: PilotPage,
 });

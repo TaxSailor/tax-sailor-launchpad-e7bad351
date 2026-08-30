@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, ArrowRight } from "lucide-react";
 import { articles, categories } from "@/lib/docs/articles";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/docs/")({
   head: () => ({
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/docs/")({
       { title: "Docs — TaxSailor" },
       { name: "description", content: "Every article on the TaxSailor graph engine, workspace, and trust posture." },
     ],
-    links: [{ rel: "canonical", href: "/docs" }],
+    links: [{ rel: "canonical", href: canonical("/docs") }],
   }),
   component: DocsIndex,
 });

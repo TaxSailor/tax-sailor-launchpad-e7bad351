@@ -5,6 +5,7 @@ import nicolasImg from "@/assets/team-nicolas.jpg";
 import petarImg from "@/assets/team-petar.jpg";
 import { LeadDialog } from "@/components/site/LeadForm";
 import { ArrowRight } from "lucide-react";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/about")({
       { property: "og:description", content: "Four founders. Munich. Building the tax graph." },
       { property: "og:url", content: "/about" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: canonical("/about") }],
   }),
   component: AboutPage,
 });
