@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LeadForm } from "@/components/site/LeadForm";
 import { useState } from "react";
 import { Mail, MapPin, Rocket, GitBranch, Building2, User } from "lucide-react";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Munich-based. Replies within 48h." },
       { property: "og:url", content: "/contact" },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: canonical("/contact") }],
   }),
   component: ContactPage,
 });

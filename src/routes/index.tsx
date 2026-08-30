@@ -11,6 +11,7 @@ import audAdvisory from "@/assets/audience-advisory.jpg.asset.json";
 import audCorporations from "@/assets/audience-corporations-new.jpg.asset.json";
 import audIndividuals from "@/assets/audience-individuals-real.jpg.asset.json";
 import { RouteGraph } from "@/components/site/RouteGraph";
+import { canonical } from "@/lib/site";
 const munichCityscape = munichFacade;
 
 
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: heroImage.url },
       { property: "og:url", content: "/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: canonical("/") }],
   }),
   component: Home,
 });

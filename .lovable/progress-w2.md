@@ -228,3 +228,24 @@ Next: Batch 5 — /demo QR proof surface, assistant handoff, analytics events.
 - /demo added to nav, footer and sitemap.
 Verification: tsgo clean; /demo returns 200.
 Next: Batch 6 — link audit, head metadata sweep, performance and responsive pass, publish prep.
+
+## Batch 6 — Link audit, metadata, responsive and publish prep — DONE (2026-08-30)
+- src/lib/site.ts: SITE_URL + canonical() helper. Every public route now emits an
+  absolute canonical (/, /demo, /pricing, /investors, /pilot, /corporations,
+  /individuals, /docs, /docs/{slug}, /about, /contact). Removed the duplicate
+  canonical from the /docs layout so article pages emit exactly one.
+- /docs index gained og:title, og:description, og:type and twitter:card.
+- sitemap.xml: absolute URLs, plus /pricing, /docs and all nine doc articles.
+- robots.txt: sitemap reference and Disallow for workspace, account, admin and
+  every auth route. All private routes already carry robots: noindex.
+- Link audit: every internal Link target resolves to a real route file. Route
+  smoke: /, /demo, /investors, /pilot, /corporations, /individuals, /pricing,
+  /docs, /docs/how-taxsailor-works, /about, /contact, /login, /signup,
+  /forgot-password, /reset-password, /sitemap.xml, /robots.txt all 200.
+- Responsive pass at 360 / 768 / 1280 / 1920 across six public pages: no
+  horizontal overflow and no console errors, except the landing page which
+  overflows by 6px at 360 and 768. Landing is frozen by agreement, so it is
+  logged rather than changed.
+- Typecheck green.
+Remaining before go live: publish from Lovable, run the production smoke
+checklist against taxsailor.com, then set the GitHub repo back to private.

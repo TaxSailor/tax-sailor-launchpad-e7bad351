@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Home, Plane, Landmark, HeartHandshake } from "lucide-react";
 import { LeadDialog } from "@/components/site/LeadForm";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/individuals")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/individuals")({
       },
       { property: "og:url", content: "/individuals" },
     ],
-    links: [{ rel: "canonical", href: "/individuals" }],
+    links: [{ rel: "canonical", href: canonical("/individuals") }],
   }),
   component: IndPage,
 });

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { articles, getArticle, getAdjacent } from "@/lib/docs/articles";
+import { canonical } from "@/lib/site";
 
 export const Route = createFileRoute("/docs/$slug")({
   loader: ({ params }) => {
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/docs/$slug")({
         { property: "og:title", content: article.title },
         { property: "og:description", content: article.summary },
       ],
-      links: [{ rel: "canonical", href: `/docs/${article.slug}` }],
+      links: [{ rel: "canonical", href: canonical(`/docs/${article.slug}`) }],
     };
   },
   notFoundComponent: DocNotFound,
