@@ -153,10 +153,28 @@ async function commitToken(t: TokenResponse): Promise<User> {
   return user;
 }
 
+/**
+ * Rotate the stored access token in place (after a password or email change)
+ * and refresh the cached user from /auth/me.
+ */
+export async function applyToken(access_token: string, expires_in: number) {
+  return commitToken({ access_token, expires_in });
+}
+
+/** Re-read the current user from the backend without touching the token. */
+export async function refreshUser() {
+  const cur = state.session;
+  if (!cur) return null;
+  const user = await fetchMe();
+  setSession({ ...cur, user });
+  return user;
+}
+
 export async function login(email: string, password: string) {
   const t = await api.post<TokenResponse>("/auth/login", { email, password }, { skipAuth: true });
   return commitToken(t);
 }
+
 
 export async function register(email: string, password: string) {
   const t = await api.post<TokenResponse>("/auth/register", { email, password }, { skipAuth: true });

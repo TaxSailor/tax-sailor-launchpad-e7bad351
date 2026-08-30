@@ -201,3 +201,15 @@ Verification: `npx tsgo --noEmit` clean.
 Carry into Batch 4 (account/auth depth):
 - Profile edit, password change, avatar multipart upload through the proxy,
   GDPR export/delete, saved-run management, OAuth provider linking.
+
+## Batch 4 — done
+- Transport: src/lib/api-types.ts, src/lib/backend.server.ts, proxy upload path, api.upload().
+- Session: applyToken(), refreshUser() exported.
+- Account API: profile, avatar upload/remove, change email, change/set password, resend verification,
+  subscription, settings, saved runs list/replay/update/delete, activity, GDPR export, delete, OAuth providers.
+- /account redesigned: Profile, Subscription, Saved runs, Preferences, Security tabs with avatar,
+  verification card, email change, credit meter, run editor, theme/notification prefs, password set/change,
+  provider linking, data export and account deletion. 44px targets, real empty/loading/error states.
+- New routes: /forgot-password, /reset-password. Login now links to password recovery.
+- Typecheck green; /account returns 200.
+Next: Batch 5 — /demo QR proof surface, assistant handoff, analytics events.

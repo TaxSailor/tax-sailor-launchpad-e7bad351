@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PilotRouteImport } from './routes/pilot'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as IndividualsRouteImport } from './routes/individuals'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as CorporationsRouteImport } from './routes/corporations'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -41,6 +43,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -64,6 +71,11 @@ const InvestorsRoute = InvestorsRouteImport.update({
 const IndividualsRoute = IndividualsRouteImport.update({
   id: '/individuals',
   path: '/individuals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -145,11 +157,13 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
   '/docs': typeof DocsRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -166,11 +180,13 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -190,11 +206,13 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
   '/docs': typeof DocsRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/pilot': typeof PilotRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -214,11 +232,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/corporations'
     | '/docs'
+    | '/forgot-password'
     | '/individuals'
     | '/investors'
     | '/login'
     | '/pilot'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
     | '/account'
@@ -235,11 +255,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/forgot-password'
     | '/individuals'
     | '/investors'
     | '/login'
     | '/pilot'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
     | '/account'
@@ -258,11 +280,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/corporations'
     | '/docs'
+    | '/forgot-password'
     | '/individuals'
     | '/investors'
     | '/login'
     | '/pilot'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
     | '/_authenticated/account'
@@ -282,11 +306,13 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CorporationsRoute: typeof CorporationsRoute
   DocsRoute: typeof DocsRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndividualsRoute: typeof IndividualsRoute
   InvestorsRoute: typeof InvestorsRoute
   LoginRoute: typeof LoginRoute
   PilotRoute: typeof PilotRoute
   PricingRoute: typeof PricingRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -306,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -341,6 +374,13 @@ declare module '@tanstack/react-router' {
       path: '/individuals'
       fullPath: '/individuals'
       preLoaderRoute: typeof IndividualsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -484,11 +524,13 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CorporationsRoute: CorporationsRoute,
   DocsRoute: DocsRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   IndividualsRoute: IndividualsRoute,
   InvestorsRoute: InvestorsRoute,
   LoginRoute: LoginRoute,
   PilotRoute: PilotRoute,
   PricingRoute: PricingRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,

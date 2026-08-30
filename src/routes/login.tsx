@@ -109,6 +109,13 @@ function LoginPage() {
           >
             {mode === "password" ? "Use a magic link instead" : "Use password instead"}
           </button>
+          <Link
+            to="/forgot-password"
+            className="text-center text-xs text-navy/60 hover:text-teal"
+          >
+            Forgot your password?
+          </Link>
+
         </form>
       )}
     </AuthShell>
