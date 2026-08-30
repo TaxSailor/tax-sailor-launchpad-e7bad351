@@ -5,6 +5,7 @@ import { DEMO_CORRIDOR, redeemQrToken } from "@/lib/demo";
 import { getScenario, runSimulation, type WorkspaceRun } from "@/lib/workspace/scenarios";
 import { flagFor } from "@/lib/workspace/jurisdictions";
 import { useSession } from "@/lib/auth/session";
+import { canonical } from "@/lib/site";
 
 type Search = { token?: string };
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/demo")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: canonical("/demo") }],
   }),
   validateSearch: (search: Record<string, unknown>): Search => ({
     token:

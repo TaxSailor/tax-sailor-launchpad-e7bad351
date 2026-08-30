@@ -9,6 +9,13 @@ export const Route = createFileRoute("/docs/")({
     meta: [
       { title: "Docs — TaxSailor" },
       { name: "description", content: "Every article on the TaxSailor graph engine, workspace, and trust posture." },
+      { property: "og:title", content: "TaxSailor documentation" },
+      {
+        property: "og:description",
+        content: "Engine method, data sources, workspace guide, security posture and audit notes.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: canonical("/docs") }],
   }),
