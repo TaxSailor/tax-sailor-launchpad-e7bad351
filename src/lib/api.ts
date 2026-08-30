@@ -47,7 +47,7 @@ function raiseIfNotOk(result: ProxyResult, path: string): void {
   throw new ApiError(msg, result.status, body);
 }
 
-type CallOpts = { skipAuth?: boolean; mock?: () => unknown };
+type CallOpts = { skipAuth?: boolean };
 
 async function apiFetch<T>(
   path: string,
@@ -78,7 +78,3 @@ export const api = {
   del: <T>(path: string, opts: CallOpts = {}) =>
     apiFetch<T>(path, { method: "DELETE", ...opts }),
 };
-
-// Kept for legacy import sites that still reference IS_MOCK_API / API_BASE_URL.
-export const IS_MOCK_API = false;
-export const API_BASE_URL = "";

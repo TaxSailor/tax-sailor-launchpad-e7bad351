@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { LogoLockup } from "@/components/site/Logo";
-import { IS_MOCK_API } from "@/lib/api";
 
 export function AuthShell({
   title,

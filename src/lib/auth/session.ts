@@ -12,7 +12,7 @@
 // There is intentionally no /auth/logout — sign-out is client-side only.
 
 import { useSyncExternalStore } from "react";
-import { api, IS_MOCK_API } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const STORAGE_KEY = "taxsailor.session.v1";
 
