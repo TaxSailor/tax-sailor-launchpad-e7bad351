@@ -1,12 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
+  downloadText,
+  fetchExportXml,
   getCachedRun,
+  getScenario,
   loadRunFromAccount,
+  type ExportKind,
   type PathEdgeDetail,
+  type SimulationRequestPayload,
   type WorkspaceRun,
 } from "@/lib/workspace/scenarios";
+import { AlternateRoutes } from "@/components/workspace/AlternateRoutes";
+import { BestDestinations } from "@/components/workspace/BestDestinations";
 import { flagFor } from "@/lib/workspace/jurisdictions";
+
 
 export const Route = createFileRoute("/_authenticated/workspace/results/$runId")({
   head: () => ({
