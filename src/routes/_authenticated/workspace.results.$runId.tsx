@@ -246,6 +246,13 @@ function ResultsPage() {
         </>
       )}
 
+      <EvidencePanel
+        path={path}
+        pathDetails={data.path_details ?? null}
+        complianceWarnings={data.compliance_warnings ?? null}
+      />
+
+
 
       {data.compliance_pending_notice && (
         <p className="mt-6 rounded-sm border border-navy/10 bg-ghost p-4 font-mono text-[11px] leading-relaxed text-navy/70">
