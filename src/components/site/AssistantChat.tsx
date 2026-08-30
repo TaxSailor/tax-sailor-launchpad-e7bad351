@@ -46,7 +46,7 @@ export function AssistantChat() {
       const history = next
         .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim().length > 0)
         .slice(-20);
-      const reply = IS_MOCK_API ? await callMockGateway(history) : await callBackend(history);
+      const reply = await callBackend(history);
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
