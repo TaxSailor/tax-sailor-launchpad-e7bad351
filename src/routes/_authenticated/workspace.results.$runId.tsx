@@ -238,6 +238,14 @@ function ResultsPage() {
         />
       )}
 
+      {scenario && (
+        <>
+          <AlternateRoutes scenario={scenario} input={data.input} currentPath={path} />
+          <BestDestinations scenario={scenario} input={data.input} />
+        </>
+      )}
+
+
       {data.compliance_pending_notice && (
         <p className="mt-6 rounded-sm border border-navy/10 bg-ghost p-4 font-mono text-[11px] leading-relaxed text-navy/70">
           {data.compliance_pending_notice}
