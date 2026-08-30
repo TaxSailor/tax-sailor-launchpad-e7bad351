@@ -19,6 +19,7 @@ import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as IndividualsRouteImport } from './routes/individuals'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as CorporationsRouteImport } from './routes/corporations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
@@ -81,6 +82,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CorporationsRoute = CorporationsRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/demo': typeof DemoRoute
   '/docs': typeof DocsRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/demo': typeof DemoRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
   '/investors': typeof InvestorsRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/corporations': typeof CorporationsRoute
+  '/demo': typeof DemoRoute
   '/docs': typeof DocsRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/individuals': typeof IndividualsRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/demo'
     | '/docs'
     | '/forgot-password'
     | '/individuals'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/demo'
     | '/forgot-password'
     | '/individuals'
     | '/investors'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/corporations'
+    | '/demo'
     | '/docs'
     | '/forgot-password'
     | '/individuals'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   CorporationsRoute: typeof CorporationsRoute
+  DemoRoute: typeof DemoRoute
   DocsRoute: typeof DocsRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IndividualsRoute: typeof IndividualsRoute
@@ -388,6 +401,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/corporations': {
@@ -523,6 +543,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   CorporationsRoute: CorporationsRoute,
+  DemoRoute: DemoRoute,
   DocsRoute: DocsRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IndividualsRoute: IndividualsRoute,
