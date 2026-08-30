@@ -176,3 +176,11 @@
   will-change: transform;
 }
 .image-reveal:hover img { transform: scale(1.05); }
+
+/* Prevent horizontal scroll from entrance animations that translate on the x axis. */
+html {
+  overflow-x: clip;
+}
+body {
+  overflow-x: clip;
+}
