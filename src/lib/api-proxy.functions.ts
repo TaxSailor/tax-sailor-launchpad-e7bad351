@@ -37,7 +37,7 @@ export type ProxyResult = {
 
 export const backendProxy = createServerFn({ method: "POST" })
   .inputValidator((raw) => inputSchema.parse(raw))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<ProxyResult> => {
     const url = `${BACKEND_URL}/api${data.path}`;
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -66,10 +66,10 @@ export const backendProxy = createServerFn({ method: "POST" })
     }
 
     const text = await res.text();
-    let parsed: unknown = null;
+    let parsed: Json = null;
     if (text) {
       try {
-        parsed = JSON.parse(text);
+        parsed = JSON.parse(text) as Json;
       } catch {
         parsed = text;
       }
