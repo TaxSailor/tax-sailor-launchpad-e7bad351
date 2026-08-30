@@ -1,12 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
+  downloadText,
+  fetchExportXml,
   getCachedRun,
+  getScenario,
   loadRunFromAccount,
+  type ExportKind,
   type PathEdgeDetail,
+  type SimulationRequestPayload,
   type WorkspaceRun,
 } from "@/lib/workspace/scenarios";
+import { AlternateRoutes } from "@/components/workspace/AlternateRoutes";
+import { BestDestinations } from "@/components/workspace/BestDestinations";
 import { flagFor } from "@/lib/workspace/jurisdictions";
+
 
 export const Route = createFileRoute("/_authenticated/workspace/results/$runId")({
   head: () => ({
@@ -79,6 +87,7 @@ function ResultsPage() {
   const path = data.optimal_path ?? [];
   const hops = data.hop_count ?? Math.max(0, path.length - 1);
   const verified = data.best_label_eligible !== false && !data.uses_statutory_edges;
+  const scenario = getScenario(data.scenarioId);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 md:py-16">
@@ -230,6 +239,14 @@ function ResultsPage() {
         />
       )}
 
+      {scenario && (
+        <>
+          <AlternateRoutes scenario={scenario} input={data.input} currentPath={path} />
+          <BestDestinations scenario={scenario} input={data.input} />
+        </>
+      )}
+
+
       {data.compliance_pending_notice && (
         <p className="mt-6 rounded-sm border border-navy/10 bg-ghost p-4 font-mono text-[11px] leading-relaxed text-navy/70">
           {data.compliance_pending_notice}
@@ -270,20 +287,21 @@ function ResultsPage() {
       )}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        {data.oecd_cbcr_xml && (
-          <DownloadButton
-            label="OECD CbCR XML"
-            filename={`cbcr_${data.runId}.xml`}
-            content={data.oecd_cbcr_xml}
-          />
-        )}
-        {data.globe_gir_xml && (
-          <DownloadButton
-            label="GloBE GIR XML"
-            filename={`gir_${data.runId}.xml`}
-            content={data.globe_gir_xml}
-          />
-        )}
+        <ExportButton
+          label="OECD CbCR XML"
+          kind="cbcr"
+          filename={`cbcr_${data.runId}.xml`}
+          inline={data.oecd_cbcr_xml ?? null}
+          request={data.request}
+        />
+        <ExportButton
+          label="GloBE GIR XML"
+          kind="gir"
+          filename={`gir_${data.runId}.xml`}
+          inline={data.globe_gir_xml ?? null}
+          request={data.request}
+        />
+
         <button
           type="button"
           onClick={() => window.print()}
@@ -314,32 +332,51 @@ function ResultsPage() {
   );
 }
 
-function DownloadButton({
+function ExportButton({
   label,
+  kind,
   filename,
-  content,
+  inline,
+  request,
 }: {
   label: string;
+  kind: ExportKind;
   filename: string;
-  content: string;
+  inline: string | null;
+  request: SimulationRequestPayload;
 }) {
-  const onClick = () => {
-    const blob = new Blob([content], { type: "application/xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onClick() {
+    setError(null);
+    if (inline) {
+      downloadText(filename, inline);
+      return;
+    }
+    setBusy(true);
+    try {
+      const xml = await fetchExportXml(kind, request);
+      downloadText(filename, xml);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export unavailable on your plan.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white"
-    >
-      {label}
-    </button>
+    <span className="inline-flex flex-col gap-1">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={busy}
+        className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white disabled:opacity-50"
+      >
+        {busy ? "Preparing" : label}
+      </button>
+      {error && <span className="max-w-56 text-[11px] text-amber-800">{error}</span>}
+    </span>
   );
 }
 

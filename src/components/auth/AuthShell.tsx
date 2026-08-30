@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { LogoLockup } from "@/components/site/Logo";
-import { IS_MOCK_API } from "@/lib/api";
 
 export function AuthShell({
   title,
@@ -20,11 +19,6 @@ export function AuthShell({
         <Link to="/" className="justify-self-center">
           <LogoLockup />
         </Link>
-        {IS_MOCK_API && (
-          <div className="rounded-sm border border-teal/30 bg-teal/5 px-3 py-2 text-center text-[11px] font-mono uppercase tracking-widest text-teal">
-            Preview · mock auth · any credentials accepted
-          </div>
-        )}
         <div className="grid gap-2 text-center">
           <h1 className="font-serif text-3xl text-navy">{title}</h1>
           {subtitle && <p className="text-sm text-navy/60">{subtitle}</p>}

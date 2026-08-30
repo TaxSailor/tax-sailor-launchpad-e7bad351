@@ -492,3 +492,72 @@ export async function runTopPaths(
     req as unknown as Record<string, unknown>,
   );
 }
+
+// ----- Best destinations --------------------------------------------------
+
+export type BestDestination = {
+  destination: string;
+  path: string[];
+  retained_earnings_pct?: number | null;
+  tax_leakage_pct?: number | null;
+  retained_pct_band?: string | null;
+  hops?: number | null;
+  best_label_eligible: boolean;
+  routable: boolean;
+  compliance_warnings: string[];
+  limitations: string[];
+};
+
+export type BestDestinationsResponse = {
+  candidates: number;
+  compliance_pending_notice: string;
+  data_gaps: string[];
+  limitations: string[];
+  gated: boolean;
+  entitlement_tier?: string | null;
+  destinations: BestDestination[];
+};
+
+export async function runBestDestinations(
+  scenario: ScenarioDef,
+  input: ScenarioInput,
+  topN = 8,
+): Promise<BestDestinationsResponse> {
+  const req = { ...buildRequest(scenario, input), top_n: topN };
+  return api.post<BestDestinationsResponse>(
+    "/simulate/best-destinations",
+    req as unknown as Record<string, unknown>,
+  );
+}
+
+// ----- Regulatory exports -------------------------------------------------
+
+export type ExportKind = "cbcr" | "gir";
+
+/** Requests the regulatory XML for a stored request payload. */
+export async function fetchExportXml(
+  kind: ExportKind,
+  request: SimulationRequestPayload,
+): Promise<string> {
+  const res = await api.post<unknown>(
+    `/simulate/export/${kind}`,
+    request as unknown as Record<string, unknown>,
+  );
+  if (typeof res === "string") return res;
+  if (res && typeof res === "object") {
+    const candidate = (res as Record<string, unknown>)["xml"] ?? (res as Record<string, unknown>)["content"];
+    if (typeof candidate === "string") return candidate;
+  }
+  throw new Error("The export service returned no document.");
+}
+
+/** Triggers a browser download for a text document. */
+export function downloadText(filename: string, content: string, mime = "application/xml"): void {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
