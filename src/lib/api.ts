@@ -47,9 +47,11 @@ function raiseIfNotOk(result: ProxyResult, path: string): void {
   throw new ApiError(msg, result.status, body);
 }
 
+type CallOpts = { skipAuth?: boolean; mock?: () => unknown };
+
 async function apiFetch<T>(
   path: string,
-  init: RequestInit & { skipAuth?: boolean } = {},
+  init: RequestInit & CallOpts = {},
 ): Promise<T> {
   const method = (init.method ?? "GET").toUpperCase() as "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   const token = init.skipAuth ? null : await getAuthToken();
