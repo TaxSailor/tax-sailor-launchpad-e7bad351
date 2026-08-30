@@ -39,8 +39,7 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
 
 function ScenarioPage() {
   const { scenarioId } = Route.useParams();
-  const scenario = getScenario(scenarioId);
-  if (!scenario) return null;
+  const scenario = getScenario(scenarioId)!; // loader 404s on unknown ids
   const navigate = useNavigate();
   const [origin, setOrigin] = useState<string>("DE");
   const [destination, setDestination] = useState<string>("CH");
