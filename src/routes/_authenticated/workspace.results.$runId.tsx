@@ -278,20 +278,21 @@ function ResultsPage() {
       )}
 
       <div className="mt-8 flex flex-wrap gap-3">
-        {data.oecd_cbcr_xml && (
-          <DownloadButton
-            label="OECD CbCR XML"
-            filename={`cbcr_${data.runId}.xml`}
-            content={data.oecd_cbcr_xml}
-          />
-        )}
-        {data.globe_gir_xml && (
-          <DownloadButton
-            label="GloBE GIR XML"
-            filename={`gir_${data.runId}.xml`}
-            content={data.globe_gir_xml}
-          />
-        )}
+        <ExportButton
+          label="OECD CbCR XML"
+          kind="cbcr"
+          filename={`cbcr_${data.runId}.xml`}
+          inline={data.oecd_cbcr_xml ?? null}
+          request={data.request}
+        />
+        <ExportButton
+          label="GloBE GIR XML"
+          kind="gir"
+          filename={`gir_${data.runId}.xml`}
+          inline={data.globe_gir_xml ?? null}
+          request={data.request}
+        />
+
         <button
           type="button"
           onClick={() => window.print()}
