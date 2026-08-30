@@ -54,44 +54,29 @@ const MOCK_USERS: UserRow[] = [
 ];
 
 export function getAdminMetrics() {
-  return api.get<AdminMetrics>("/api/admin/metrics", {
-    mock: () => ({
-      users_total: 128,
-      users_new_7d: 14,
-      leads_total: 42,
-      leads_new_7d: 9,
-      simulations_total: 1_284,
-      simulations_7d: 172,
-      mrr_eur: 4_820,
-      paying_customers: 23,
-    }),
-  });
+  return api.get<AdminMetrics>("/api/admin/metrics");
 }
 
 export function listLeads() {
-  return api.get<{ items: LeadRow[] }>("/api/admin/leads", {
-    mock: () => ({ items: MOCK_LEADS }),
-  });
+  return api.get<{ items: LeadRow[] }>("/api/admin/leads");
 }
 
 export function updateLeadStatus(id: string, status: LeadRow["status"]) {
   return api.patch<{ ok: boolean }>(
     `/api/admin/leads/${id}`,
     { status },
-    { mock: () => ({ ok: true }) },
+    { },
   );
 }
 
 export function listUsers() {
-  return api.get<{ items: UserRow[] }>("/api/admin/users", {
-    mock: () => ({ items: MOCK_USERS }),
-  });
+  return api.get<{ items: UserRow[] }>("/api/admin/users");
 }
 
 export function setUserRole(id: string, role: "user" | "admin") {
   return api.patch<{ ok: boolean }>(
     `/api/admin/users/${id}`,
     { role },
-    { mock: () => ({ ok: true }) },
+    { },
   );
 }

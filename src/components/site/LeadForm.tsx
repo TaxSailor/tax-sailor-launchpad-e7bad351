@@ -51,7 +51,7 @@ async function submitLead(payload: LeadPayload) {
       message,
       website: payload.website || undefined,
     },
-    { skipAuth: true, mock: () => ({ id: Date.now(), created_at: new Date().toISOString(), message: "Received." }) },
+    { skipAuth: true },
   );
 }
 

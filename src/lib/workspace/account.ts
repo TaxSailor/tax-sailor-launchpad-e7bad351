@@ -45,19 +45,7 @@ function mapProfile(p: BackendProfile): AccountProfile {
 
 export function getProfile(): Promise<AccountProfile> {
   return api
-    .get<BackendProfile>("/account/profile", {
-      mock: () => ({
-        user_id: 1,
-        email: "you@taxsailor.com",
-        email_verified: true,
-        has_password: true,
-        display_name: "You",
-        avatar_url: null,
-        avatar_uploaded: false,
-        locale: "en",
-        marketing_opt_in: false,
-      }),
-    })
+    .get<BackendProfile>("/account/profile")
     .then(mapProfile);
 }
 
@@ -68,19 +56,7 @@ export function updateProfile(patch: {
   avatar_url?: string | null;
 }): Promise<AccountProfile> {
   return api
-    .patch<BackendProfile>("/account/profile", patch as Record<string, unknown>, {
-      mock: () => ({
-        user_id: 1,
-        email: "you@taxsailor.com",
-        email_verified: true,
-        has_password: true,
-        display_name: patch.display_name ?? "You",
-        avatar_url: patch.avatar_url ?? null,
-        avatar_uploaded: false,
-        locale: patch.locale ?? "en",
-        marketing_opt_in: patch.marketing_opt_in ?? false,
-      }),
-    })
+    .patch<BackendProfile>("/account/profile", patch as Record<string, unknown>)
     .then(mapProfile);
 }
 
@@ -96,16 +72,7 @@ export type AccountSubscription = {
 };
 
 export function getSubscription(): Promise<AccountSubscription> {
-  return api.get<AccountSubscription>("/account/subscription", {
-    mock: () => ({
-      tier: "anonymous",
-      tier_label: "Free preview",
-      status: "none",
-      renews_at: null,
-      simulations_used: 0,
-      simulations_included: 3,
-    }),
-  });
+  return api.get<AccountSubscription>("/account/subscription");
 }
 
 // ---- Saved runs --------------------------------------------------------
@@ -157,14 +124,7 @@ function mapSavedRun(r: BackendSavedRun): SavedRunSummary {
 
 export function listRuns(): Promise<{ runs: SavedRunSummary[] }> {
   return api
-    .get<BackendSavedRunList>("/account/runs?limit=50", {
-      mock: () => ({
-        total: 0,
-        limit: 50,
-        offset: 0,
-        runs: [],
-      }),
-    })
+    .get<BackendSavedRunList>("/account/runs?limit=50")
     .then((r) => ({ runs: r.runs.map(mapSavedRun) }));
 }
 
@@ -178,20 +138,7 @@ export function getSavedRun(runId: string): Promise<SavedRunReplay> {
     .get<BackendSavedRun & { request_payload: Record<string, unknown>; response_payload: Record<string, unknown> | null }>(
       `/account/runs/${encodeURIComponent(runId)}`,
       {
-        mock: () => ({
-          id: Number(runId) || 0,
-          title: "Preview run",
-          notes: null,
-          scenario_key: "corporate_dividend",
-          simulation_mode: "corporate_direct",
-          source_label: "DE",
-          target_label: "SG",
-          retained_pct: 82,
-          created_at: new Date().toISOString(),
-          gated: false,
-          request_payload: {},
-          response_payload: null,
-        }),
+        
       },
     )
     .then((r) => ({
@@ -214,7 +161,7 @@ export async function changePassword(current_password: string, new_password: str
   const t = await api.post<{ access_token: string; expires_in: number; token_type?: string }>(
     "/account/change-password",
     { current_password, new_password },
-    { mock: () => ({ access_token: "mock.token", expires_in: 3600 * 24 * 7 }) },
+    { },
   );
   const { getAuthToken } = await import("@/lib/auth/session");
   // Rotate stored token in place so the current tab keeps working.
