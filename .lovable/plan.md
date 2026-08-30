@@ -65,6 +65,19 @@ Link audit across every route, head metadata per page, sitemap update, image and
 - Shared logic ported into `src/lib/workspace/`, `src/lib/evidence/`, `src/lib/gating/`, `src/lib/account/`, keeping the naming from the old modules so future syncs are readable.
 - Admin console stays on mock data until backend admin endpoints exist. I will flag it rather than fake it.
 
+## Responsive design — works on every device
+
+The site must look and work correctly on any device: phone, tablet, laptop, desktop, and ultrawide monitor. This applies to every page, not only the landing page.
+
+- One codebase, fluid breakpoints. We design with a mobile-first layout and layer in tablet, desktop, and ultrawide adaptations through Tailwind breakpoints (sm, md, lg, xl, 2xl). No separate mobile site, no device-specific forks.
+- Layouts that do not scale gracefully on their own get explicit per-cluster treatment:
+  - Phone (under 640px): single column, stacked cards, full-width inputs, bottom-sheet-style modals, a hamburger nav, and touch targets at least 44px.
+  - Tablet (640 to 1024px): two-column grids where useful, sidebar where it adds value, comfortable thumb reach.
+  - Desktop and ultrawide (1024px and up): the full editorial layout, multi-column results, side-by-side evidence and results panels, and a max content width so lines stay readable on very wide screens.
+- The workspace results page, scenario setup, and account page get the most attention, because their data density is highest. On phone they collapse to a guided vertical flow; on tablet they use a two-column shell; on desktop they use the full panel layout.
+- If, after the redesign pass, a device cluster still does not reach a good state with one codebase, we can split that single surface into a device-targeted variant as a last resort. That decision is made per page during the page-by-page redesign, not up front.
+- Every batch ends with a responsive check at 360px, 768px, 1280px, and 1920px widths, and the Batch 6 performance pass re-checks all four before publish.
+
 ## What I need from you
 
 - Keep the repo public until Batch 0 finishes. I will tell you the moment it is safe to flip back.
