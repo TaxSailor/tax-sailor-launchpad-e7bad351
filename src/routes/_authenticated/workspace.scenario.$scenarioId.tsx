@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
   loader: ({ params }) => {
     const s = getScenario(params.scenarioId);
     if (!s) throw notFound();
-    return { scenario: s };
+    return { scenarioId: params.scenarioId };
   },
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-6 py-24 text-center">
