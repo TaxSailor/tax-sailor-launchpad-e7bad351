@@ -13,6 +13,8 @@ import {
 } from "@/lib/workspace/scenarios";
 import { AlternateRoutes } from "@/components/workspace/AlternateRoutes";
 import { BestDestinations } from "@/components/workspace/BestDestinations";
+import { EvidencePanel } from "@/components/workspace/EvidencePanel";
+
 import { flagFor } from "@/lib/workspace/jurisdictions";
 
 
