@@ -147,3 +147,35 @@ Carry into Batch 2:
 - /simulate/best-destinations, /simulate/export/cbcr, /simulate/export/gir.
 - Retire the remaining IS_MOCK_API / API_BASE_URL references in
   AuthShell.tsx, AssistantChat.tsx and auth/session.ts.
+
+## Batch 2 — Results depth, ranked paths, destination scan, exports — DONE (2026-08-30)
+
+Shipped:
+- `src/lib/workspace/scenarios.ts`: added `runBestDestinations`
+  (POST /simulate/best-destinations, top_n), `fetchExportXml` for
+  /simulate/export/cbcr and /simulate/export/gir (accepts raw XML string or
+  {xml|content} envelope), and a shared `downloadText` helper.
+- `src/components/workspace/AlternateRoutes.tsx`: on-demand top-K panel.
+  Shows rank, full flagged route, retained share (exact, masked or band),
+  hop count, treaty vs statutory basis, compliance-note count, and marks the
+  route currently open.
+- `src/components/workspace/BestDestinations.tsx`: on-demand destination scan
+  table (destination, retained, hops, route, routable flag).
+- Results page: both panels mounted, export buttons now work whether the XML
+  came inline in the simulate response or has to be fetched from the export
+  endpoints, with per-button busy and error states. Removed the old
+  inline-only DownloadButton.
+- Mock plumbing retired end to end: `IS_MOCK_API` / `API_BASE_URL` and all
+  `mock:` call options removed from api.ts, auth/session.ts, workspace/account.ts,
+  admin.ts, LeadForm.tsx, AuthShell.tsx. AssistantChat now posts through the
+  proxy to /ui/chat (the local /api/assistant gateway route is no longer used).
+  session.ts login/register/magic-link/reset all go token -> /auth/me;
+  OAuth authorize now points at /api/auth/oauth/{provider}/authorize.
+
+Verification: `npx tsgo --noEmit` clean; /workspace responds 200.
+
+Carry into Batch 3:
+- Evidence surfaces: /documents/summary, /documents/route-sources,
+  /documents/route-citations.
+- Server-driven gating polish (entitlement tier badges, upgrade prompts).
+- Decide whether to delete `src/routes/api/assistant.ts` (now unused).
