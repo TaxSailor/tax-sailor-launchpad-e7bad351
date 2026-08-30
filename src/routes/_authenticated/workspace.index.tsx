@@ -164,8 +164,9 @@ function WorkspacePage() {
                     </span>
                   </span>
                   <span className="whitespace-nowrap font-mono text-sm text-teal">
-                    {((1 - r.effective_tax_pct) * 100).toFixed(1)}%
+                    {r.retained_pct === null ? "Gated" : `${r.retained_pct.toFixed(1)}%`}
                   </span>
+
                 </Link>
               </li>
             ))}
