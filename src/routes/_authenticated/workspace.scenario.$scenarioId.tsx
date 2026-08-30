@@ -16,9 +16,7 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
     ],
   }),
   loader: ({ params }) => {
-    const s = getScenario(params.scenarioId);
-    if (!s) throw notFound();
-    return { scenario: s };
+    if (!getScenario(params.scenarioId)) throw notFound();
   },
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-6 py-24 text-center">
@@ -40,7 +38,8 @@ export const Route = createFileRoute("/_authenticated/workspace/scenario/$scenar
 });
 
 function ScenarioPage() {
-  const { scenario } = Route.useLoaderData();
+  const { scenarioId } = Route.useParams();
+  const scenario = getScenario(scenarioId)!; // loader 404s on unknown ids
   const navigate = useNavigate();
   const [origin, setOrigin] = useState<string>("DE");
   const [destination, setDestination] = useState<string>("CH");
