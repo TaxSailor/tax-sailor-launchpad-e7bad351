@@ -380,35 +380,6 @@ function ExportButton({
   );
 }
 
-function DownloadButton({
-  label,
-  filename,
-  content,
-}: {
-  label: string;
-  filename: string;
-  content: string;
-}) {
-  const onClick = () => {
-    const blob = new Blob([content], { type: "application/xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="min-h-11 rounded-sm border border-teal/50 bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-teal hover:bg-teal hover:text-white"
-    >
-      {label}
-    </button>
-  );
-}
-
 function NoteBlock({
   title,
   tone,
